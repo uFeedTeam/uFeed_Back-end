@@ -1,2 +1,2 @@
 # uFeed_Back-end
-C# code for uFeed implementation.
+C# code for uFeed project implementation.
