@@ -50,8 +50,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EF\UFeedContext.cs" />
-    <Compile Include="EF\StoreDbInitializer.cs" />
+    <Compile Include="EF\UFeedDbInitializer.cs" />
     <Compile Include="Entities\BaseType.cs" />
+    <Compile Include="Entities\Login.cs" />
     <Compile Include="Entities\Social\Attach\Album.cs" />
     <Compile Include="Entities\Social\Attach\Attachment.cs" />
     <Compile Include="Entities\Social\Attach\Document.cs" />

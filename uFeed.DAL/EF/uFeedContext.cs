@@ -7,7 +7,7 @@ namespace uFeed.DAL.EF
     {
         static UFeedContext()
         {
-            Database.SetInitializer(new StoreDbInitializer());
+            Database.SetInitializer(new UFeedDbInitializer());
         }
 
         public UFeedContext(string connectionString)

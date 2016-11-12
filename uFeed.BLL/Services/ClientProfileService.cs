@@ -82,9 +82,14 @@ namespace uFeed.BLL.Services
 
             var dalType = (DAL.Enums.Socials) type;
 
-            if (!clientProfile.Logins.Contains(dalType))
+            if (clientProfile.Logins == null)
             {
-                clientProfile.Logins.Add(dalType);
+                clientProfile.Logins = new List<Login>();
+            }
+
+            if (!clientProfile.Logins.Select(l => l.LoginType).Contains(dalType))
+            {
+                clientProfile.Logins.Add(new Login { ClientProfileId = clientId, LoginType = dalType });
             }
 
             _unitOfWork.ClientProfiles.Update(clientProfile);
@@ -102,16 +107,16 @@ namespace uFeed.BLL.Services
 
             var dalType = (DAL.Enums.Socials)type;
 
-            if (clientProfile.Logins.Contains(dalType))
+            if (clientProfile.Logins != null && 
+                clientProfile.Logins.Select(l => l.LoginType).Contains(dalType))
             {
-                clientProfile.Logins.Remove(dalType);
+                _unitOfWork.Logins.Delete(clientProfile.Logins.First(l => l.LoginType.Equals(dalType)).Id);
+                _unitOfWork.Save();
             }
-
-            _unitOfWork.ClientProfiles.Update(clientProfile);
-            _unitOfWork.Save();
         }
 
-        private void AssignCategoriesToClient(ClientProfile destinationClientProfile, ClientProfileDTO sourceClientProfileDTO)
+        private void AssignCategoriesToClient(ClientProfile destinationClientProfile, 
+            ClientProfileDTO sourceClientProfileDTO)
         {
             var categoryIds = sourceClientProfileDTO.Categories.Select(category => category.Id);
             var categories = _unitOfWork.Categories.GetAll()

@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.Data.Entity;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
@@ -61,7 +62,16 @@ namespace uFeed.WEB.Models
 
         public static ApplicationDbContext Create()
         {
+            Database.SetInitializer(new AuthDbInitializer());
             return new ApplicationDbContext();
+        }
+    }
+
+    public class AuthDbInitializer : DropCreateDatabaseAlways<ApplicationDbContext>
+    {
+        protected override void Seed(ApplicationDbContext db)
+        {
+            db.SaveChanges();
         }
     }
 }

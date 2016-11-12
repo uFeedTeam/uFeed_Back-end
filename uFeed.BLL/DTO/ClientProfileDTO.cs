@@ -7,6 +7,7 @@ namespace uFeed.BLL.DTO
     {
         public ClientProfileDTO()
         {
+            Logins = new List<Socials>();
             Categories = new List<CategoryDTO>();
         }
 

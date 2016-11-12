@@ -13,6 +13,7 @@ namespace uFeed.DAL.UnitOfWorks
 
         private IRepository<ClientProfile> _clientProfileRepository;
         private IRepository<Category> _categoryRepository;
+        private IRepository<Login> _loginRepository;
 
         public UFeedUnitOfWork(string connectionString)
         {
@@ -22,6 +23,8 @@ namespace uFeed.DAL.UnitOfWorks
         public IRepository<ClientProfile> ClientProfiles => _clientProfileRepository ?? (_clientProfileRepository = new CommonRepository<ClientProfile>(_db));
 
         public IRepository<Category> Categories => _categoryRepository ?? (_categoryRepository = new CommonRepository<Category>(_db));
+
+        public IRepository<Login> Logins => _loginRepository ?? (_loginRepository = new CommonRepository<Login>(_db));
 
         public void Save()
         {

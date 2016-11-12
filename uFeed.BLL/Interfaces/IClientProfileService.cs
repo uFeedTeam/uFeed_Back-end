@@ -17,5 +17,7 @@ namespace uFeed.BLL.Interfaces
         void Delete(int id);
 
         void AddLogin(int clientId, Socials type);
+
+        void RemoveLogin(int clientId, Socials type);
     }
 }

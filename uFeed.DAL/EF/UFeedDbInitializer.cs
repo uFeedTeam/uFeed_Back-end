@@ -2,7 +2,7 @@
 
 namespace uFeed.DAL.EF
 {
-    public class StoreDbInitializer : DropCreateDatabaseAlways<UFeedContext>
+    public class UFeedDbInitializer : DropCreateDatabaseAlways<UFeedContext>
     {
         protected override void Seed(UFeedContext db)
         {           

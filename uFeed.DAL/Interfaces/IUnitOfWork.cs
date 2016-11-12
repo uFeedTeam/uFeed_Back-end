@@ -9,6 +9,8 @@ namespace uFeed.DAL.Interfaces
 
         IRepository<Category> Categories { get; }
 
+        IRepository<Login> Logins { get; }
+
         void Save();
     }
 }
