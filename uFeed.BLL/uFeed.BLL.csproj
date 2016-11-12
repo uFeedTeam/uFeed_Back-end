@@ -48,16 +48,29 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DTO\CategoryDTO.cs" />
+    <Compile Include="DTO\ClientProfileDTO.cs" />
+    <Compile Include="DTO\SocialAuthorDTO.cs" />
+    <Compile Include="DTO\Social\Attach\AlbumDTO.cs" />
+    <Compile Include="DTO\Social\Attach\AttachmentDTO.cs" />
+    <Compile Include="DTO\Social\Attach\DocumentDTO.cs" />
+    <Compile Include="DTO\Social\Attach\LikesDTO.cs" />
+    <Compile Include="DTO\Social\Attach\LinkDTO.cs" />
+    <Compile Include="DTO\Social\Attach\PollAnswerDTO.cs" />
+    <Compile Include="DTO\Social\Attach\PollDTO.cs" />
+    <Compile Include="DTO\Social\Attach\VideoDTO.cs" />
+    <Compile Include="DTO\Social\AuthorDTO.cs" />
+    <Compile Include="DTO\Social\PhotoDTO.cs" />
+    <Compile Include="DTO\Social\PostDTO.cs" />
+    <Compile Include="DTO\Social\UserInfoDTO.cs" />
+    <Compile Include="Enums\Socials.cs" />
     <Compile Include="Infrastructure\AutomapperProfiles\DTOToEntityProfile.cs" />
     <Compile Include="Infrastructure\AutomapperProfiles\EntityToDTOProfile.cs" />
     <Compile Include="Infrastructure\Exceptions\EntityNotFoundException.cs" />
     <Compile Include="Infrastructure\Exceptions\ServiceException.cs" />
     <Compile Include="Infrastructure\Exceptions\ValidationException.cs" />
     <Compile Include="Infrastructure\ServiceModule.cs" />
-    <Compile Include="Interfaces\ICommentService.cs" />
-    <Compile Include="Interfaces\IGameService.cs" />
-    <Compile Include="Interfaces\IGenreService.cs" />
-    <Compile Include="Interfaces\IPlatformService.cs" />
+    <Compile Include="Interfaces\IClientProfileService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -69,6 +82,7 @@
       <Name>uFeed.DAL</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using uFeed.DAL.Entities.Enums;
+using uFeed.DAL.Enums;
 
 namespace uFeed.DAL.Entities.Social
 {

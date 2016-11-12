@@ -61,7 +61,7 @@
     <Compile Include="Entities\Social\Attach\PollAnswer.cs" />
     <Compile Include="Entities\Social\Attach\Video.cs" />
     <Compile Include="Entities\SocialAuthor.cs" />
-    <Compile Include="Entities\Enums\Socials.cs" />
+    <Compile Include="Enums\Socials.cs" />
     <Compile Include="Entities\Social\Author.cs" />
     <Compile Include="Entities\Category.cs" />
     <Compile Include="Entities\ClientProfile.cs" />

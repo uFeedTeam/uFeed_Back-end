@@ -1,4 +1,4 @@
-﻿namespace uFeed.DAL.Entities.Enums
+﻿namespace uFeed.BLL.Enums
 {
     public enum Socials
     {
