@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using uFeed.DAL.Enums;
 
 namespace uFeed.DAL.Entities
 {
@@ -10,6 +11,8 @@ namespace uFeed.DAL.Entities
 
         [Required]
         public string Email { get; set; }
+
+        public ICollection<Socials> Logins { get; set; }
 
         public byte[] Photo { get; set; }
 
