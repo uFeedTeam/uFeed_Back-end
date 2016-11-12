@@ -6,28 +6,31 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
-using System.Web.Http.ModelBinding;
+using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.OAuth;
+using uFeed.BLL.DTO;
+using uFeed.BLL.Interfaces;
 using uFeed.WEB.Models;
 using uFeed.WEB.Providers;
 using uFeed.WEB.Results;
 
 namespace uFeed.WEB.Controllers
 {
-    [Authorize]
-    [RoutePrefix("api/Account")]
+    [System.Web.Http.Authorize]
+    [System.Web.Http.RoutePrefix("api/Account")]
     public class AccountController : ApiController
     {
         private const string LocalLoginProvider = "Local";
         private ApplicationUserManager _userManager;
+        private readonly IClientProfileService _clientProfileService;
 
         public AccountController()
         {
+            _clientProfileService = DependencyResolver.Current.GetService<IClientProfileService>();
         }
 
         public AccountController(ApplicationUserManager userManager,
@@ -35,6 +38,7 @@ namespace uFeed.WEB.Controllers
         {
             UserManager = userManager;
             AccessTokenFormat = accessTokenFormat;
+            _clientProfileService = DependencyResolver.Current.GetService<IClientProfileService>();
         }
 
         public ApplicationUserManager UserManager
@@ -53,7 +57,7 @@ namespace uFeed.WEB.Controllers
 
         // GET api/Account/UserInfo
         [HostAuthentication(DefaultAuthenticationTypes.ExternalBearer)]
-        [Route("UserInfo")]
+        [System.Web.Http.Route("UserInfo")]
         public UserInfoViewModel GetUserInfo()
         {
             ExternalLoginData externalLogin = ExternalLoginData.FromIdentity(User.Identity as ClaimsIdentity);
@@ -67,7 +71,7 @@ namespace uFeed.WEB.Controllers
         }
 
         // POST api/Account/Logout
-        [Route("Logout")]
+        [System.Web.Http.Route("Logout")]
         public IHttpActionResult Logout()
         {
             Authentication.SignOut(CookieAuthenticationDefaults.AuthenticationType);
@@ -75,10 +79,10 @@ namespace uFeed.WEB.Controllers
         }
 
         // GET api/Account/ManageInfo?returnUrl=%2F&generateState=true
-        [Route("ManageInfo")]
+        [System.Web.Http.Route("ManageInfo")]
         public async Task<ManageInfoViewModel> GetManageInfo(string returnUrl, bool generateState = false)
         {
-            IdentityUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            ApplicationUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId<int>());
 
             if (user == null)
             {
@@ -87,7 +91,7 @@ namespace uFeed.WEB.Controllers
 
             List<UserLoginInfoViewModel> logins = new List<UserLoginInfoViewModel>();
 
-            foreach (IdentityUserLogin linkedAccount in user.Logins)
+            foreach (UserLogin linkedAccount in user.Logins)
             {
                 logins.Add(new UserLoginInfoViewModel
                 {
@@ -115,7 +119,7 @@ namespace uFeed.WEB.Controllers
         }
 
         // POST api/Account/ChangePassword
-        [Route("ChangePassword")]
+        [System.Web.Http.Route("ChangePassword")]
         public async Task<IHttpActionResult> ChangePassword(ChangePasswordBindingModel model)
         {
             if (!ModelState.IsValid)
@@ -123,7 +127,7 @@ namespace uFeed.WEB.Controllers
                 return BadRequest(ModelState);
             }
 
-            IdentityResult result = await UserManager.ChangePasswordAsync(User.Identity.GetUserId(), model.OldPassword,
+            IdentityResult result = await UserManager.ChangePasswordAsync(User.Identity.GetUserId<int>(), model.OldPassword,
                 model.NewPassword);
             
             if (!result.Succeeded)
@@ -135,7 +139,7 @@ namespace uFeed.WEB.Controllers
         }
 
         // POST api/Account/SetPassword
-        [Route("SetPassword")]
+        [System.Web.Http.Route("SetPassword")]
         public async Task<IHttpActionResult> SetPassword(SetPasswordBindingModel model)
         {
             if (!ModelState.IsValid)
@@ -143,7 +147,7 @@ namespace uFeed.WEB.Controllers
                 return BadRequest(ModelState);
             }
 
-            IdentityResult result = await UserManager.AddPasswordAsync(User.Identity.GetUserId(), model.NewPassword);
+            IdentityResult result = await UserManager.AddPasswordAsync(User.Identity.GetUserId<int>(), model.NewPassword);
 
             if (!result.Succeeded)
             {
@@ -154,7 +158,7 @@ namespace uFeed.WEB.Controllers
         }
 
         // POST api/Account/AddExternalLogin
-        [Route("AddExternalLogin")]
+        [System.Web.Http.Route("AddExternalLogin")]
         public async Task<IHttpActionResult> AddExternalLogin(AddExternalLoginBindingModel model)
         {
             if (!ModelState.IsValid)
@@ -180,7 +184,7 @@ namespace uFeed.WEB.Controllers
                 return BadRequest("The external login is already associated with an account.");
             }
 
-            IdentityResult result = await UserManager.AddLoginAsync(User.Identity.GetUserId(),
+            IdentityResult result = await UserManager.AddLoginAsync(User.Identity.GetUserId<int>(),
                 new UserLoginInfo(externalData.LoginProvider, externalData.ProviderKey));
 
             if (!result.Succeeded)
@@ -192,7 +196,7 @@ namespace uFeed.WEB.Controllers
         }
 
         // POST api/Account/RemoveLogin
-        [Route("RemoveLogin")]
+        [System.Web.Http.Route("RemoveLogin")]
         public async Task<IHttpActionResult> RemoveLogin(RemoveLoginBindingModel model)
         {
             if (!ModelState.IsValid)
@@ -204,11 +208,11 @@ namespace uFeed.WEB.Controllers
 
             if (model.LoginProvider == LocalLoginProvider)
             {
-                result = await UserManager.RemovePasswordAsync(User.Identity.GetUserId());
+                result = await UserManager.RemovePasswordAsync(User.Identity.GetUserId<int>());
             }
             else
             {
-                result = await UserManager.RemoveLoginAsync(User.Identity.GetUserId(),
+                result = await UserManager.RemoveLoginAsync(User.Identity.GetUserId<int>(),
                     new UserLoginInfo(model.LoginProvider, model.ProviderKey));
             }
 
@@ -221,10 +225,10 @@ namespace uFeed.WEB.Controllers
         }
 
         // GET api/Account/ExternalLogin
-        [OverrideAuthentication]
+        [System.Web.Http.OverrideAuthentication]
         [HostAuthentication(DefaultAuthenticationTypes.ExternalCookie)]
-        [AllowAnonymous]
-        [Route("ExternalLogin", Name = "ExternalLogin")]
+        [System.Web.Http.AllowAnonymous]
+        [System.Web.Http.Route("ExternalLogin", Name = "ExternalLogin")]
         public async Task<IHttpActionResult> GetExternalLogin(string provider, string error = null)
         {
             if (error != null)
@@ -259,10 +263,8 @@ namespace uFeed.WEB.Controllers
             {
                 Authentication.SignOut(DefaultAuthenticationTypes.ExternalCookie);
                 
-                 ClaimsIdentity oAuthIdentity = await user.GenerateUserIdentityAsync(UserManager,
-                    OAuthDefaults.AuthenticationType);
-                ClaimsIdentity cookieIdentity = await user.GenerateUserIdentityAsync(UserManager,
-                    CookieAuthenticationDefaults.AuthenticationType);
+                ClaimsIdentity oAuthIdentity = await user.GenerateUserIdentityAsync(UserManager);
+                ClaimsIdentity cookieIdentity = await user.GenerateUserIdentityAsync(UserManager);
 
                 AuthenticationProperties properties = ApplicationOAuthProvider.CreateProperties(user.UserName);
                 Authentication.SignIn(properties, oAuthIdentity, cookieIdentity);
@@ -278,8 +280,8 @@ namespace uFeed.WEB.Controllers
         }
 
         // GET api/Account/ExternalLogins?returnUrl=%2F&generateState=true
-        [AllowAnonymous]
-        [Route("ExternalLogins")]
+        [System.Web.Http.AllowAnonymous]
+        [System.Web.Http.Route("ExternalLogins")]
         public IEnumerable<ExternalLoginViewModel> GetExternalLogins(string returnUrl, bool generateState = false)
         {
             IEnumerable<AuthenticationDescription> descriptions = Authentication.GetExternalAuthenticationTypes();
@@ -319,8 +321,8 @@ namespace uFeed.WEB.Controllers
         }
 
         // POST api/Account/Register
-        [AllowAnonymous]
-        [Route("Register")]
+        [System.Web.Http.AllowAnonymous]
+        [System.Web.Http.Route("Register")]
         public async Task<IHttpActionResult> Register(RegisterBindingModel model)
         {
             if (!ModelState.IsValid)
@@ -328,7 +330,7 @@ namespace uFeed.WEB.Controllers
                 return BadRequest(ModelState);
             }
 
-            var user = new ApplicationUser() { UserName = model.Email, Email = model.Email };
+            var user = new ApplicationUser { UserName = model.Email, Email = model.Email, Name = model.Name };
 
             IdentityResult result = await UserManager.CreateAsync(user, model.Password);
 
@@ -337,13 +339,22 @@ namespace uFeed.WEB.Controllers
                 return GetErrorResult(result);
             }
 
+            var clientProfile = new ClientProfileDTO
+            {
+                Id = user.Id,
+                Email = user.Email,
+                Name = user.Name
+            };
+
+            _clientProfileService.Create(clientProfile);
+
             return Ok();
         }
 
         // POST api/Account/RegisterExternal
-        [OverrideAuthentication]
+        [System.Web.Http.OverrideAuthentication]
         [HostAuthentication(DefaultAuthenticationTypes.ExternalBearer)]
-        [Route("RegisterExternal")]
+        [System.Web.Http.Route("RegisterExternal")]
         public async Task<IHttpActionResult> RegisterExternal(RegisterExternalBindingModel model)
         {
             if (!ModelState.IsValid)

@@ -4,6 +4,11 @@ namespace uFeed.BLL.DTO
 {
     public class CategoryDTO
     {
+        public CategoryDTO()
+        {
+            Authors = new List<SocialAuthorDTO>();
+        }
+
         public int Id { get; set; }
 
         public string Name { get; set; }

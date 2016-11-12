@@ -4,6 +4,11 @@ namespace uFeed.BLL.DTO
 {
     public class ClientProfileDTO
     {
+        public ClientProfileDTO()
+        {
+            Categories = new List<CategoryDTO>();
+        }
+
         public int Id { get; set; }
 
         public string Name { get; set; }
