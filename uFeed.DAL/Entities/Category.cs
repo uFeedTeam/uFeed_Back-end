@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using uFeed.DAL.Entities.Social;
 
 namespace uFeed.DAL.Entities
 {
@@ -17,6 +16,6 @@ namespace uFeed.DAL.Entities
         [ForeignKey(nameof(UserId))]
         public virtual ClientProfile User { get; set; }
 
-        public virtual ICollection<Author> Authors { get; set; }
+        public ICollection<CategoryAuthor> Authors { get; set; }
     }
 }
