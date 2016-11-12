@@ -218,6 +218,21 @@
     <Compile Include="Providers\ApplicationOAuthProvider.cs" />
     <Compile Include="Results\ChallengeResult.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="ViewModels\CategoryViewModel.cs" />
+    <Compile Include="ViewModels\ClientProfileViewModel.cs" />
+    <Compile Include="ViewModels\SocialAuthorViewModel.cs" />
+    <Compile Include="ViewModels\Social\Attach\AlbumViewModel.cs" />
+    <Compile Include="ViewModels\Social\Attach\AttachmentViewModel.cs" />
+    <Compile Include="ViewModels\Social\Attach\DocumentViewModel.cs" />
+    <Compile Include="ViewModels\Social\Attach\LikesViewModel.cs" />
+    <Compile Include="ViewModels\Social\Attach\LinkViewModel.cs" />
+    <Compile Include="ViewModels\Social\Attach\PollAnswerViewModel.cs" />
+    <Compile Include="ViewModels\Social\Attach\PollViewModel.cs" />
+    <Compile Include="ViewModels\Social\Attach\VideoViewModel.cs" />
+    <Compile Include="ViewModels\Social\AuthorViewModel.cs" />
+    <Compile Include="ViewModels\Social\PhotoViewModel.cs" />
+    <Compile Include="ViewModels\Social\PostViewModel.cs" />
+    <Compile Include="ViewModels\Social\UserInfoViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />
@@ -290,6 +305,12 @@
   <ItemGroup>
     <Content Include="packages.config" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\uFeed.BLL\uFeed.BLL.csproj">
+      <Project>{36E2E796-0D94-4947-8FBE-31D78A00535E}</Project>
+      <Name>uFeed.BLL</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

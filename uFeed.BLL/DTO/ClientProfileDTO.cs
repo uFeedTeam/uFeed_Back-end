@@ -10,6 +10,6 @@ namespace uFeed.BLL.DTO
 
         public string Email { get; set; }
 
-        public virtual ICollection<CategoryDTO> Categories { get; set; }
+        public ICollection<CategoryDTO> Categories { get; set; }
     }
 }
