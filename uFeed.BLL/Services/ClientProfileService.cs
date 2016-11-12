@@ -2,6 +2,7 @@
 using System.Linq;
 using AutoMapper;
 using uFeed.BLL.DTO;
+using uFeed.BLL.Enums;
 using uFeed.BLL.Infrastructure.Exceptions;
 using uFeed.BLL.Interfaces;
 using uFeed.DAL.Entities;
@@ -67,6 +68,46 @@ namespace uFeed.BLL.Services
             }
 
             _unitOfWork.ClientProfiles.Delete(id);
+            _unitOfWork.Save();
+        }
+
+        public void AddLogin(int clientId, Socials type)
+        {
+            var clientProfile = _unitOfWork.ClientProfiles.Get(clientId);
+
+            if (clientProfile == null)
+            {
+                throw new EntityNotFoundException("Cannot find client profile", "ClientProfile");
+            }
+
+            var dalType = (DAL.Enums.Socials) type;
+
+            if (!clientProfile.Logins.Contains(dalType))
+            {
+                clientProfile.Logins.Add(dalType);
+            }
+
+            _unitOfWork.ClientProfiles.Update(clientProfile);
+            _unitOfWork.Save();
+        }
+
+        public void RemoveLogin(int clientId, Socials type)
+        {
+            var clientProfile = _unitOfWork.ClientProfiles.Get(clientId);
+
+            if (clientProfile == null)
+            {
+                throw new EntityNotFoundException("Cannot find client profile", "ClientProfile");
+            }
+
+            var dalType = (DAL.Enums.Socials)type;
+
+            if (clientProfile.Logins.Contains(dalType))
+            {
+                clientProfile.Logins.Remove(dalType);
+            }
+
+            _unitOfWork.ClientProfiles.Update(clientProfile);
             _unitOfWork.Save();
         }
 

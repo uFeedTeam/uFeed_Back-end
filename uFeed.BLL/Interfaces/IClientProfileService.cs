@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using uFeed.BLL.DTO;
+using uFeed.BLL.Enums;
 
 namespace uFeed.BLL.Interfaces
 {
@@ -14,5 +15,7 @@ namespace uFeed.BLL.Interfaces
         void Update(ClientProfileDTO clientProfileDTO);
 
         void Delete(int id);
+
+        void AddLogin(int clientId, Socials type);
     }
 }
