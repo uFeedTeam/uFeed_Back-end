@@ -30,6 +30,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -41,15 +49,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Entities\Attach\Album.cs" />
-    <Compile Include="Entities\Attach\Attachment.cs" />
-    <Compile Include="Entities\Attach\Document.cs" />
-    <Compile Include="Entities\Attach\Likes.cs" />
-    <Compile Include="Entities\Attach\Link.cs" />
-    <Compile Include="Entities\Attach\Poll.cs" />
-    <Compile Include="Entities\Attach\PollAnswer.cs" />
-    <Compile Include="Entities\Attach\Video.cs" />
-    <Compile Include="Entities\CategoryAuthor.cs" />
+    <Compile Include="EF\UFeedContext.cs" />
+    <Compile Include="EF\StoreDbInitializer.cs" />
+    <Compile Include="Entities\BaseType.cs" />
+    <Compile Include="Entities\Social\Attach\Album.cs" />
+    <Compile Include="Entities\Social\Attach\Attachment.cs" />
+    <Compile Include="Entities\Social\Attach\Document.cs" />
+    <Compile Include="Entities\Social\Attach\Likes.cs" />
+    <Compile Include="Entities\Social\Attach\Link.cs" />
+    <Compile Include="Entities\Social\Attach\Poll.cs" />
+    <Compile Include="Entities\Social\Attach\PollAnswer.cs" />
+    <Compile Include="Entities\Social\Attach\Video.cs" />
+    <Compile Include="Entities\SocialAuthor.cs" />
     <Compile Include="Entities\Enums\Socials.cs" />
     <Compile Include="Entities\Social\Author.cs" />
     <Compile Include="Entities\Category.cs" />
@@ -57,9 +68,16 @@
     <Compile Include="Entities\Social\Photo.cs" />
     <Compile Include="Entities\Social\Post.cs" />
     <Compile Include="Entities\Social\UserInfo.cs" />
+    <Compile Include="Interfaces\IRepository.cs" />
+    <Compile Include="Interfaces\IUnitOfWork.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repositories\CommonRepository.cs" />
+    <Compile Include="UnitOfWorks\UFeedUnitOfWork.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

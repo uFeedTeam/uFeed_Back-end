@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using uFeed.DAL.Entities.Attach;
+using uFeed.DAL.Entities.Social.Attach;
 
 namespace uFeed.DAL.Entities.Social
 {

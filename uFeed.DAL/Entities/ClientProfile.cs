@@ -3,10 +3,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace uFeed.DAL.Entities
 {
-    public class ClientProfile
+    public class ClientProfile : BaseType
     {
-        public int Id { get; set; }
-
         [Required]
         public string Name { get; set; }
 

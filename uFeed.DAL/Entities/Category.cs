@@ -4,10 +4,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace uFeed.DAL.Entities
 {
-    public class Category
+    public class Category : BaseType
     {
-        public long Id { get; set; }
-
         [Required]
         public string Name { get; set; }
 
@@ -16,6 +14,6 @@ namespace uFeed.DAL.Entities
         [ForeignKey(nameof(UserId))]
         public virtual ClientProfile User { get; set; }
 
-        public ICollection<CategoryAuthor> Authors { get; set; }
+        public ICollection<SocialAuthor> Authors { get; set; }
     }
 }
