@@ -8,8 +8,10 @@ namespace uFeed.BLL.DTO
 
         public string Name { get; set; }
 
-        public virtual ClientProfileDTO User { get; set; }
+        public int UserId { get; set; }
 
-        public virtual ICollection<SocialAuthorDTO> Authors { get; set; }
+        public ClientProfileDTO User { get; set; }
+
+        public ICollection<SocialAuthorDTO> Authors { get; set; }
     }
 }

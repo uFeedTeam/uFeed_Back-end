@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using uFeed.BLL.DTO;
+using uFeed.DAL.Entities;
 
 namespace uFeed.BLL.Infrastructure.AutomapperProfiles
 {
@@ -6,7 +8,8 @@ namespace uFeed.BLL.Infrastructure.AutomapperProfiles
     {
         public DTOToEntityProfile()
         {
-
+            CreateMap<ClientProfileDTO, ClientProfile>();
+            CreateMap<CategoryDTO, Category>();
         }
     }
 }

@@ -21,7 +21,7 @@ namespace uFeed.DAL.UnitOfWorks
 
         public IRepository<ClientProfile> ClientProfiles => _clientProfileRepository ?? (_clientProfileRepository = new CommonRepository<ClientProfile>(_db));
 
-        public IRepository<Category> Comments => _categoryRepository ?? (_categoryRepository = new CommonRepository<Category>(_db));
+        public IRepository<Category> Categories => _categoryRepository ?? (_categoryRepository = new CommonRepository<Category>(_db));
 
         public void Save()
         {
