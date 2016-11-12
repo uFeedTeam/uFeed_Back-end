@@ -330,7 +330,7 @@ namespace uFeed.WEB.Controllers
                 return BadRequest(ModelState);
             }
 
-            var user = new ApplicationUser { UserName = model.Email, Email = model.Email, Name = model.Name };
+            var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
 
             IdentityResult result = await UserManager.CreateAsync(user, model.Password);
 
@@ -343,7 +343,7 @@ namespace uFeed.WEB.Controllers
             {
                 Id = user.Id,
                 Email = user.Email,
-                Name = user.Name
+                Name = model.Name
             };
 
             _clientProfileService.Create(clientProfile);
