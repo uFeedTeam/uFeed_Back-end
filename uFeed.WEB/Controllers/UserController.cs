@@ -1,4 +1,7 @@
-﻿using System.Net;
+﻿using System.Drawing;
+using System.IO;
+using System.Net;
+using System.Web;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using uFeed.BLL.Enums;
@@ -65,6 +68,52 @@ namespace uFeed.WEB.Controllers
 
         //public void Delete(int id)
         //{
+        //    _clientProfileService.Delete(id);
         //}
+
+        [HttpPost]
+        [Route("newphoto")]
+        public void NewPhoto(HttpPostedFile file)
+        {
+            const int someAccountId = 1;
+
+            if (file == null) return;
+
+            var data = GetBytesFromFile(file);
+            var currentUser = _clientProfileService.Get(someAccountId);
+
+            currentUser.Photo = data;
+
+            _clientProfileService.Update(currentUser);
+        }
+
+        //Getting array of bytes from posted image
+        private static byte [] GetBytesFromFile(HttpPostedFile file)
+        {
+            using (var inputStream = file.InputStream)
+            {
+                var memoryStream = inputStream as MemoryStream;
+
+                if (memoryStream != null) return memoryStream.ToArray();
+
+                memoryStream = new MemoryStream();
+                inputStream.CopyTo(memoryStream);
+                return memoryStream.ToArray();
+            }
+        }
+
+
+        //Convert array of bytes to image
+        public static Image ConvertToImage(byte[] arrayOfBytes)
+        {
+            Image image;
+
+            using (var ms = new MemoryStream(arrayOfBytes))
+            {
+                image = Image.FromStream(ms);
+            }
+
+            return image;
+        }
     }
 }
