@@ -1,10 +1,12 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Web;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using uFeed.BLL.Enums;
+using uFeed.BLL.Infrastructure.Exceptions;
 using uFeed.BLL.Interfaces;
 
 namespace uFeed.WEB.Controllers
@@ -60,30 +62,50 @@ namespace uFeed.WEB.Controllers
 
         [HttpPut]
         [Route("newname")]
-        public void EditName(string name)
+        public IHttpActionResult EditName(string name)
         {
             var accountId = User.Identity.GetUserId<int>();
 
             var userAccount = _clientProfileService.Get(accountId);
             userAccount.Name = name;
 
-            _clientProfileService.Update(userAccount);
+            try
+            {
+                _clientProfileService.Update(userAccount);
+            }
+            catch (ServiceException)
+            {
+                return StatusCode(HttpStatusCode.BadRequest);
+            }
+
+            return StatusCode(HttpStatusCode.OK);
         }
 
         [HttpPut]
         [Route("newphoto")]
-        public void NewPhoto(HttpPostedFile file)
+        public IHttpActionResult NewPhoto(HttpPostedFile file)
         {
             var accountId = User.Identity.GetUserId<int>();
 
-            if (file == null) return;
+            if (file == null)
+            {
+                return StatusCode(HttpStatusCode.BadRequest);
+            }
 
             var data = GetBytesFromFile(file);
             var userAccount = _clientProfileService.Get(accountId);
 
             userAccount.Photo = data;
+            try
+            {
+                _clientProfileService.Update(userAccount);
+            }
+            catch (ServiceException)
+            {
+                return StatusCode(HttpStatusCode.BadRequest);
+            }
 
-            _clientProfileService.Update(userAccount);
+            return StatusCode(HttpStatusCode.OK);
         }
 
         //Getting array of bytes from posted image
