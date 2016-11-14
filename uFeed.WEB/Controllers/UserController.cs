@@ -72,6 +72,18 @@ namespace uFeed.WEB.Controllers
         //}
 
         [HttpPost]
+        [Route("newname")]
+        public void EditName(string name)
+        {
+            const int someAccountId = 1;
+
+            var userAccount = _clientProfileService.Get(someAccountId);
+            userAccount.Name = name;
+
+            _clientProfileService.Update(userAccount);
+        }
+
+        [HttpPost]
         [Route("newphoto")]
         public void NewPhoto(HttpPostedFile file)
         {
@@ -80,11 +92,11 @@ namespace uFeed.WEB.Controllers
             if (file == null) return;
 
             var data = GetBytesFromFile(file);
-            var currentUser = _clientProfileService.Get(someAccountId);
+            var userAccount = _clientProfileService.Get(someAccountId);
 
-            currentUser.Photo = data;
+            userAccount.Photo = data;
 
-            _clientProfileService.Update(currentUser);
+            _clientProfileService.Update(userAccount);
         }
 
         //Getting array of bytes from posted image
@@ -101,7 +113,6 @@ namespace uFeed.WEB.Controllers
                 return memoryStream.ToArray();
             }
         }
-
 
         //Convert array of bytes to image
         public static Image ConvertToImage(byte[] arrayOfBytes)
