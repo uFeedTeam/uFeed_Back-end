@@ -58,41 +58,28 @@ namespace uFeed.WEB.Controllers
             return StatusCode(HttpStatusCode.OK);
         }
 
-        //public void Post([FromBody]string value)
-        //{
-        //}
-
-        //public void Put(int id, [FromBody]string value)
-        //{
-        //}
-
-        //public void Delete(int id)
-        //{
-        //    _clientProfileService.Delete(id);
-        //}
-
-        [HttpPost]
+        [HttpPut]
         [Route("newname")]
         public void EditName(string name)
         {
-            const int someAccountId = 1;
+            var accountId = User.Identity.GetUserId<int>();
 
-            var userAccount = _clientProfileService.Get(someAccountId);
+            var userAccount = _clientProfileService.Get(accountId);
             userAccount.Name = name;
 
             _clientProfileService.Update(userAccount);
         }
 
-        [HttpPost]
+        [HttpPut]
         [Route("newphoto")]
         public void NewPhoto(HttpPostedFile file)
         {
-            const int someAccountId = 1;
+            var accountId = User.Identity.GetUserId<int>();
 
             if (file == null) return;
 
             var data = GetBytesFromFile(file);
-            var userAccount = _clientProfileService.Get(someAccountId);
+            var userAccount = _clientProfileService.Get(accountId);
 
             userAccount.Photo = data;
 
