@@ -14,11 +14,19 @@ namespace uFeed.DAL.EF
             : base(connectionString)
         {
         }
-
+  
         public virtual DbSet<ClientProfile> ClientProfiles { get; set; }
 
         public virtual DbSet<Category> Categories { get; set; }
 
         public virtual DbSet<SocialAuthor> SocialAuthors { get; set; }
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ClientProfile>()
+            .HasMany(a => a.Categories)
+            .WithRequired(a => a.User)
+            .WillCascadeOnDelete(true);
+        }
     }
 }

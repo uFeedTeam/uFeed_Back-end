@@ -17,6 +17,7 @@ using uFeed.BLL.Interfaces;
 using uFeed.WEB.Models;
 using uFeed.WEB.Providers;
 using uFeed.WEB.Results;
+using uFeed.BLL.Infrastructure.Exceptions;
 
 namespace uFeed.WEB.Controllers
 {
@@ -382,6 +383,30 @@ namespace uFeed.WEB.Controllers
                 return GetErrorResult(result); 
             }
             return Ok();
+        }
+
+        [System.Web.Http.HttpPost]
+        public async Task<IHttpActionResult> Delete()
+        {
+            var user = await UserManager.FindByIdAsync(User.Identity.GetUserId<int>());
+
+            if (user != null)
+            {
+                IdentityResult result = await UserManager.DeleteAsync(user);
+                if (result.Succeeded)
+                {
+                    try
+                    {
+                        _clientProfileService.Delete(user.Id);
+                    }
+                    catch(EntityNotFoundException)
+                    {
+                        return BadRequest();
+                    }
+                    return Ok();
+                }
+            }
+            return BadRequest();
         }
 
         protected override void Dispose(bool disposing)
