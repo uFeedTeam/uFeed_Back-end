@@ -42,7 +42,7 @@ namespace uFeed.WEB.Controllers
             return StatusCode(HttpStatusCode.OK);
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("get")]
         public IHttpActionResult Get()
         {
