@@ -71,7 +71,19 @@ namespace uFeed.WEB.Models
     {
         protected override void Seed(ApplicationDbContext db)
         {
-            db.SaveChanges();
+            var userManager = new ApplicationUserManager(new UserStore(db));
+
+            var admin = new ApplicationUser
+            {
+                Id = 1,
+                Email = "qwe@qwe",
+                UserName = "qwe"
+            };
+            string password = "Admin_1234";
+
+            userManager.Create(admin, password);
+
+            base.Seed(db);
         }
     }
 }

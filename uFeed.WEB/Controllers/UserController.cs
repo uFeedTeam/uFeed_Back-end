@@ -8,6 +8,7 @@ using Microsoft.AspNet.Identity;
 using uFeed.BLL.Enums;
 using uFeed.BLL.Infrastructure.Exceptions;
 using uFeed.BLL.Interfaces;
+using uFeed.WEB.ViewModels;
 
 namespace uFeed.WEB.Controllers
 {
@@ -62,12 +63,17 @@ namespace uFeed.WEB.Controllers
 
         [HttpPut]
         [Route("newname")]
-        public IHttpActionResult EditName(string name)
+        public IHttpActionResult EditName([FromBody] ClientProfileViewModel user)
         {
             var accountId = User.Identity.GetUserId<int>();
 
+            if (string.IsNullOrEmpty(user?.Name))
+            {
+                return StatusCode(HttpStatusCode.BadRequest);
+            }
+
             var userAccount = _clientProfileService.Get(accountId);
-            userAccount.Name = name;
+            userAccount.Name = user.Name;
 
             try
             {
@@ -83,7 +89,7 @@ namespace uFeed.WEB.Controllers
 
         [HttpPut]
         [Route("newphoto")]
-        public IHttpActionResult NewPhoto(HttpPostedFile file)
+        public IHttpActionResult NewPhoto([FromBody] byte[] file)
         {
             var accountId = User.Identity.GetUserId<int>();
 
@@ -92,10 +98,9 @@ namespace uFeed.WEB.Controllers
                 return StatusCode(HttpStatusCode.BadRequest);
             }
 
-            var data = GetBytesFromFile(file);
             var userAccount = _clientProfileService.Get(accountId);
 
-            userAccount.Photo = data;
+            userAccount.Photo = file;
             try
             {
                 _clientProfileService.Update(userAccount);
@@ -109,7 +114,7 @@ namespace uFeed.WEB.Controllers
         }
 
         //Getting array of bytes from posted image
-        private static byte [] GetBytesFromFile(HttpPostedFile file)
+        private static byte[] GetBytesFromFile(HttpPostedFile file)
         {
             using (var inputStream = file.InputStream)
             {
