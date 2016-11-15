@@ -42,6 +42,13 @@ namespace uFeed.WEB.Controllers
             return StatusCode(HttpStatusCode.OK);
         }
 
+        [HttpGet]
+        [Route("get")]
+        public IHttpActionResult Get()
+        {
+            return Json(_clientProfileService.Get(User.Identity.GetUserId<int>()));
+        }
+
         [HttpPost]
         [Route("removelogin")]
         public IHttpActionResult RemoveLogin([FromBody] Socials socialNetwork)
