@@ -68,11 +68,11 @@
     <Compile Include="Models\VkModel\VkLikes.cs" />
     <Compile Include="Models\VkModel\VkWallPost.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\Vk\API.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\FacebookModel\" />
     <Folder Include="Services\Facebook\" />
-    <Folder Include="Services\Vk\" />
     <Folder Include="UnitOfWorks\" />
   </ItemGroup>
   <ItemGroup>
