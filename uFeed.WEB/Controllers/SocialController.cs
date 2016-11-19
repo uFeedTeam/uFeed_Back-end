@@ -18,15 +18,15 @@ namespace uFeed.WEB.Controllers
             _socialService = socialService;
         }
 
-        private const string CLIENT_ID = "5494787";
-        private const string REDIRECT_URI = "https://oauth.vk.com/blank.html";
+        private const string ClientId = "5494787";
+        private const string RedirectUrl = "https://oauth.vk.com/blank.html";
 
         [HttpGet]
         [Route("vkauth")]
         public IHttpActionResult AuthenticationVk()
         {
             string url =
-                $"https://oauth.vk.com/authorize?client_id={CLIENT_ID}&display=popup&redirect_uri={REDIRECT_URI}&scope=groups,audio&response_type=token&v=5.52";
+                $"https://oauth.vk.com/authorize?client_id={ClientId}&display=popup&redirect_uri={RedirectUrl}&scope=groups,audio&response_type=token&v=5.52";
             return Redirect(url);
         }
 
@@ -50,15 +50,15 @@ namespace uFeed.WEB.Controllers
 
             var userInfoes = _socialService.GetUserInfo();
             var authorsVkAll = _socialService.GetAllAuthors(Socials.Vk);
-            var authorsFacebookAll = _socialService.GetAllAuthors(Socials.Facebook);
+            //var authorsFacebookAll = _socialService.GetAllAuthors(Socials.Facebook);
 
             var authorsVk = _socialService.GetAuthors(1, 10, Socials.Vk);
-            var authorsFacebook = _socialService.GetAuthors(1, 10, Socials.Facebook);
+            //var authorsFacebook = _socialService.GetAuthors(1, 10, Socials.Facebook);
 
             authorsVk = _socialService.GetAuthors(2, 10, Socials.Vk);
-            authorsFacebook = _socialService.GetAuthors(2, 10, Socials.Facebook);
+            //authorsFacebook = _socialService.GetAuthors(2, 10, Socials.Facebook);
 
-            authorsVk.AddRange(authorsFacebook);
+            //authorsVk.AddRange(authorsFacebook);
 
             var socialAuthors = authorsVk.Select(authorDTO => new SocialAuthorDTO
             {

@@ -75,14 +75,16 @@ namespace uFeed.DAL.SocialService.Services.Vk
 
             while (authorsCount > 0)
             {
-                vkFeed.AddRange(GetFeedLess25(category.Authors.ToList(), count, page - 1, 25, authorsOffset));
+                
                 if (authorsCount > 25)
-                {        
+                {
+                    vkFeed.AddRange(GetFeedLess25(category.Authors.ToList(), count, (page - 1) * count, 25, authorsOffset));
                     authorsCount -= 25;
                     authorsOffset += 25;
                 }
                 else
                 {
+                    vkFeed.AddRange(GetFeedLess25(category.Authors.ToList(), count, (page - 1) * count, authorsCount, authorsOffset));
                     authorsOffset += authorsCount;
                     authorsCount = 0;
                 }
@@ -116,6 +118,7 @@ namespace uFeed.DAL.SocialService.Services.Vk
         private List<Post> ConvertToGeneralPostList(IEnumerable<VkWallPost> vkFeed)
         {
             var generalFeed = new List<Post>();
+            List<Author> currentAuthorList = GetAllAuthors();
 
             foreach (var vkPost in vkFeed)
             {
@@ -133,7 +136,7 @@ namespace uFeed.DAL.SocialService.Services.Vk
                     }
                 };
 
-                List<Author> currentAuthorList = GetAllAuthors();
+                
 
                 try
                 {
@@ -335,8 +338,8 @@ namespace uFeed.DAL.SocialService.Services.Vk
         private IEnumerable<VkWallPost> GetFeedLess25(List<SocialAuthor> authors, int countPosts,int feedOffset, int countAuthors, int authorsOffset)
         {
             //todo index out of range here
-            var executeMethodText = GetExecuteMethodTextForFeed(authors.GetRange(0 + authorsOffset, countAuthors),
-                countPosts, feedOffset);   
+            List<SocialAuthor> offsetedAythorList = authors.GetRange(0 + authorsOffset, countAuthors);
+            var executeMethodText = GetExecuteMethodTextForFeed(offsetedAythorList,countPosts, feedOffset);   
             string requestString =
                 $"https://api.vk.com/method/execute?v=5.52&access_token={AccessToken}&code={executeMethodText}";
             var token = MakeRequest(requestString);

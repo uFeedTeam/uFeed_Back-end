@@ -49,14 +49,18 @@ namespace uFeed.BLL.Services
 
             var mapper = config.CreateMapper();
             var userInfoes = new List<UserInfo>();
-            var fbUser = _socialUnitOfWork.FacebookApi.GetUserInfo();
-            var vkUser = _socialUnitOfWork.VkApi.GetUserInfo();
 
-            userInfoes.AddRange(new[]
+            if (_socialUnitOfWork.FacebookApi != null)
             {
-                fbUser,
-                vkUser
-            });
+                var fbUser = _socialUnitOfWork.FacebookApi.GetUserInfo();
+                userInfoes.Add(fbUser);
+            }
+
+            if (_socialUnitOfWork.FacebookApi != null)
+            {
+                var vkUser = _socialUnitOfWork.VkApi.GetUserInfo();
+                userInfoes.Add(vkUser);
+            }
 
             return mapper.Map<IEnumerable<UserInfoDTO>>(userInfoes).ToList();
         }
@@ -99,8 +103,6 @@ namespace uFeed.BLL.Services
         {
             var category = Mapper.Map<Category>(categoryDto);
 
-            var feed = new List<Post>();
-
             var fbCategory = new Category
             {
                 Id = category.Id,
@@ -119,8 +121,16 @@ namespace uFeed.BLL.Services
                     .Where(x => x.Source == Entities.Enums.Socials.Vk).ToList()
             };
 
-            feed.AddRange(_socialUnitOfWork.FacebookApi.GetFeed(fbCategory, page, countPosts));
-            //feed.AddRange(_socialUnitOfWork.VkApi.GetFeed(vkCategory, page, countPosts)); //todo uncomment
+            var feed = new List<Post>();
+            if (fbCategory.Authors.Any())
+            {
+                feed.AddRange(_socialUnitOfWork.FacebookApi.GetFeed(fbCategory, page, countPosts));
+            }
+
+            if (vkCategory.Authors.Any())
+            {
+                feed.AddRange(_socialUnitOfWork.VkApi.GetFeed(vkCategory, page, countPosts));
+            }
 
             return Mapper.Map<IEnumerable<PostDTO>>(feed).ToList();
         }
