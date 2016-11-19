@@ -52,7 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Interfaces\ISocialApi.cs" />
-    <Compile Include="Interfaces\ISocialException.cs" />
+    <Compile Include="Exceptions\SocialException.cs" />
     <Compile Include="Interfaces\ISocialUnitOfWork.cs" />
     <Compile Include="Models\FacebookModel\AccessToken.cs" />
     <Compile Include="Models\FacebookModel\Common\Paging.cs" />
@@ -90,18 +90,11 @@
     <Compile Include="Models\VkModel\VkWallPost.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\Facebook\Api.cs" />
-    <Compile Include="Services\Facebook\FacebookException.cs" />
     <Compile Include="Services\Facebook\Request.cs" />
     <Compile Include="UnitOfWorks\SocialUnitOfWork.cs" />
     <Compile Include="Services\Vk\API.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\VkModel\" />
-    <Folder Include="Services\Vk\" />
-    <Folder Include="Models\FacebookModel\" />
-    <Folder Include="Services\Facebook\" />
-    <Folder Include="UnitOfWorks\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\uFeed.Entities\uFeed.Entities.csproj">
       <Project>{FC24E123-C79F-45B8-82CC-E2F15EDED34A}</Project>

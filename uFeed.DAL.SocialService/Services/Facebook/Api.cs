@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
-using System.Web;
 using System.Web.Script.Serialization;
+using uFeed.DAL.SocialService.Exceptions;
 using uFeed.DAL.SocialService.Interfaces;
 using uFeed.DAL.SocialService.Models.FacebookModel;
 using uFeed.DAL.SocialService.Models.FacebookModel.Feed;
@@ -29,15 +29,13 @@ namespace uFeed.DAL.SocialService.Services.Facebook
         private const string AppSecret = "18715401fbc856779f25f04595d7b20f";
         private const string Permissions = "user_likes,user_posts,user_managed_groups";
 
-        private readonly HttpSessionStateBase _session;
+        private readonly string _token;
         private readonly JavaScriptSerializer _serializer;
 
-        public Api(string code, HttpSessionStateBase sessionObj)
+        public Api(string code)
         {
             _serializer = new JavaScriptSerializer();
-
-            _session = sessionObj;
-            _session["FacebookAccessToken"] = Login(code);           
+            _token = Login(code);
         }
 
         public static string GetCodeLink()
@@ -46,12 +44,8 @@ namespace uFeed.DAL.SocialService.Services.Facebook
                 $"{FacebookOauth}?client_id={AppId}&redirect_uri={RedirectUrl}&scope={Permissions}";
         }
 
-        #region Authors
-
         public List<Author> GetAllAuthors()
         {
-            CheckAccessToken();
-
             SerializedLikes likes = null;
             var result = new List<Author>();
 
@@ -60,8 +54,7 @@ namespace uFeed.DAL.SocialService.Services.Facebook
                 do
                 {
                     var likesResult = likes == null
-                        ? Request.ExecuteFacebookRequest("me/?fields=likes.limit(100){name,id,picture,link}",
-                            (string) _session["FacebookAccessToken"], "get")
+                        ? Request.ExecuteFacebookRequest("me/?fields=likes.limit(100){name,id,picture,link}", _token, "get")
                         : Request.SendGetRequest(likes.Likes.Paging.Next, null);
 
                     likes = _serializer.Deserialize<SerializedLikes>(likesResult);
@@ -84,93 +77,57 @@ namespace uFeed.DAL.SocialService.Services.Facebook
             }
             catch (WebException e)
             {
-                throw new FacebookException("Cannot get all authors.\n" + e.Message);
-            }          
+                throw new SocialException("Cannot get all authors.\n" + e.Message);
+            }    
+                  
             return result;
 
         }
 
-        public List<Author> GetAuthors(int count)
+        public List<Author> GetAuthors(int page, int count)
         {
-            CheckAccessToken();
-
             var result = new List<Author>();
 
             try
             {
-                if (count < 1) throw new WebException("Argument 'count' must be grater than 0");
-                string likesResult =
-                    Request.ExecuteFacebookRequest("me/?fields=likes.limit(" + count + "){name,id,picture,link}",
-                        (string) _session["FacebookAccessToken"], "get");
-                SerializedLikes likes = _serializer.Deserialize<SerializedLikes>(likesResult);
-                foreach (var item in likes.Likes.Data)
+                if (count < 1 || page < 1)
                 {
-                    result.Add(new Author()
-                    {
-                        Id = item.Id,
-                        Name = item.Name,
-                        Photo = new Photo {Url = item.Picture.Data.Url},
-                        Url = item.Link,
-                        Source = Socials.Facebook
-                    });
+                    throw new WebException("Arguments 'count' and 'page' must be grater than 0");
                 }
-                _session["FacebookNextAuthors"] = likes.Likes.Paging.Next;
+
+                string likesResult =
+                    Request.ExecuteFacebookRequest("me/?fields=likes.limit(" + count + ").offset(" + count * page + "){name,id,picture,link}",
+                        _token, "get");
+
+                var likes = _serializer.Deserialize<SerializedLikes>(likesResult);
+
+                result.AddRange(likes.Likes.Data.Select(item => new Author()
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    Photo = new Photo {Url = item.Picture.Data.Url},
+                    Url = item.Link,
+                    Source = Socials.Facebook
+                }));
             }
             catch (WebException e)
             {
-                throw new FacebookException("Cannot get authors.\n" + e.Message);
+                throw new SocialException("Cannot get authors.\n" + e.Message);
             }
 
             return result;
         }
 
-        public void GetNextAuthors(List<Author> authors)
+        public List<Post> GetFeed(Category category, int page, int countPosts)
         {
-            CheckAccessToken();
-
-            try
-            {
-                if (_session["FacebookNextAuthors"] == null)
-                    throw new FacebookException("There are no next authors: call GetAuthors firstly.");
-                var likesResult = Request.SendGetRequest((string)_session["FacebookNextAuthors"], null);
-                var likes = _serializer.Deserialize<GroupsCollection>(likesResult);
-                if (likes.Data == null) return;
-                foreach (var item in likes.Data)
-                {
-                    authors.Add(new Author
-                    {
-                        Id = item.Id,
-                        Name = item.Name,
-                        Photo = new Photo { Url = item.Picture.Data.Url },
-                        Url = item.Link,
-                        Source = Socials.Facebook
-                    });
-                }
-                if (likes.Paging != null)
-                    _session["FacebookNextAuthors"] = likes.Paging.Next;
-            }
-            catch (WebException e)
-            {
-                throw new FacebookException("Cannot get next authors" + e.Message);
-            }
-        }
-
-        #endregion
-
-        #region Feed
-
-        public List<Post> GetFeed(Category category, int countPosts)
-        {
-            CheckAccessToken();
-
             var serializedResult = new List<SerializedFeed>();
             var result = new List<Post>();
 
             try
             {
-                if (countPosts < 1)
+                if (countPosts < 1 || page < 1)
                 {
-                    throw new WebException("Argument 'countPosts' must be grater than 0");
+                    throw new WebException("Arguments 'countPosts' and 'page' must be grater than 0");
                 }
 
                 if (category == null)
@@ -188,138 +145,51 @@ namespace uFeed.DAL.SocialService.Services.Facebook
 
                 for (count = 1; count <= category.Authors.Count; count++)
                 {
-                    ids += category.Authors.ElementAt(count-1).AuthorId + ",";
+                    ids += category.Authors.ElementAt(count - 1).AuthorId + ",";
 
-                    if (count%10 == 0)
+                    if (count % 10 == 0)
                     {
-                        serializedResult.AddRange(ExecuteFeedRequest(ids.Substring(0, ids.Length - 1), countPosts, 0));
+                        serializedResult.AddRange(ExecuteFeedRequest(ids.Substring(0, ids.Length - 1), countPosts, page + countPosts));
                         ids = "";
-                    }               
+                    }
                 }
 
-                if (count%10 != 0 && count%10 - 1 != 0)
+                if (count % 10 != 0 && count % 10 - 1 != 0)
                 {
-                    serializedResult.AddRange(ExecuteFeedRequest(ids.Substring(0, ids.Length - 1), countPosts, 0));
+                    serializedResult.AddRange(ExecuteFeedRequest(ids.Substring(0, ids.Length - 1), countPosts, page + countPosts));
                 }
 
                 result = ConvertFeed(serializedResult);
-
-                _session["FacebookNextFeedCount"] = countPosts;
-                _session["FacebookNextFeedOffset"] = (int?) _session["FacebookNextFeedOffset"] + countPosts ?? countPosts;
-                _session["FacebookNextFeedCategory"] = category;
             }
             catch (WebException e)
             {
-                throw new FacebookException("Cannot get feed.\n" + e.Message);
+                throw new SocialException("Cannot get feed.\n" + e.Message);
             }
 
             return result;
-        }
-
-        public void GetNextFeed(List<Post> feed)
-        {
-            CheckAccessToken();
-
-            var serializedResult = new List<SerializedFeed>();
-
-            try
-            {
-                if (_session["FacebookNextFeedOffset"] == null || 
-                    _session["FacebookNextFeedCategory"] == null ||
-                    _session["FacebookNextFeedCount"] == null)
-                {
-                    throw new FacebookException("There are no next feed. Call GetFeed firstly");
-                }
-
-                if (feed == null)
-                {
-                    throw new FacebookException("Argument 'feed' cannot be null");
-                }
-
-                var category = (Category)_session["FacebookNextFeedCategory"];
-                int offset = (int) _session["FacebookNextFeedOffset"];
-                int countPosts = (int)_session["FacebookNextFeedCount"];
-                string ids = string.Empty;
-                int count;
-
-                for (count = 1; count <= category.Authors.Count; count++)
-                {
-                    ids += category.Authors.ElementAt(count - 1).AuthorId + ",";
-                    if (count % 10 == 0)
-                    {
-                        serializedResult.AddRange(ExecuteFeedRequest(ids.Substring(0, ids.Length - 1), countPosts, offset));
-                        ids = "";
-                    }
-                }
-                if (count % 10 != 0 && count % 10 - 1 != 0)
-                {
-                    serializedResult.AddRange(ExecuteFeedRequest(ids.Substring(0, ids.Length - 1), countPosts, offset));
-                }
-
-                int offsetIncrement = serializedResult
-                    .Sum(serFeed => serFeed.Feed?.Data
-                    .Sum(serPost => feed.Count(post => post.Id.Equals(serPost.Id))) ?? 0);
-
-                if (offsetIncrement > 0)
-                {
-                     offset += offsetIncrement;
-                    _session["FacebookNextFeedOffset"] = offset;
-
-                    serializedResult = new List<SerializedFeed>();
-
-                    ids = string.Empty;
-                    for (count = 1; count <= category.Authors.Count; count++)
-                    {
-                        ids += category.Authors.ElementAt(count - 1).AuthorId + ",";
-                        if (count % 10 == 0)
-                        {
-                            serializedResult
-                                .AddRange(ExecuteFeedRequest(ids.Substring(0, ids.Length - 1), countPosts, offset));
-                            ids = "";
-                        }
-                    }
-                    if (count % 10 != 0)
-                    {
-                        serializedResult.AddRange(ExecuteFeedRequest(ids.Substring(0, ids.Length - 1), countPosts, offset));
-                    }
-                }
-
-                feed.AddRange(ConvertFeed(serializedResult));
-
-                _session["FacebookNextFeedOffset"] = (int?)_session["FacebookNextFeedOffset"] + countPosts ?? countPosts;
-            }
-            catch (WebException e)
-            {
-                throw new FacebookException("Cannot get feed.\n" + e.Message);
-            }
-        }
-
-        #endregion
-
-        #region User
+        }        
 
         public UserInfo GetUserInfo()
         {
-            CheckAccessToken();
-
             var result = new UserInfo();
+
             try
             {                
-                var userResult = Request.ExecuteFacebookRequest("me/?fields=name,first_name,last_name,id,picture.height(500)", 
-                    (string)_session["FacebookAccessToken"], "get");
+                var userResult = Request
+                    .ExecuteFacebookRequest("me/?fields=name,first_name,last_name,id,picture.height(500)", _token, "get");
+
                 var user = _serializer.Deserialize<User>(userResult);
+
                 result.Id = user.Id;
                 result.Name = user.Name;
                 result.Photo = new Photo {Url = user.Picture.Data.Url};
             }
             catch (WebException e)
             {
-                throw new FacebookException("Cannot get user info.\n" + e.Message);
+                throw new SocialException("Cannot get user info.\n" + e.Message);
             }
             return result;
         }
-
-        #endregion
 
         private List<SerializedFeed> ExecuteFeedRequest(string ids, int countPosts, int offset)
         {
@@ -329,7 +199,7 @@ namespace uFeed.DAL.SocialService.Services.Facebook
                              ").offset(" + offset + "){message,attachments,link,name,created_time,likes.limit(0).summary(true)}";
 
             string feedResult =
-                Request.ExecuteFacebookRequest(request, (string) _session["FacebookAccessToken"], "get");
+                Request.ExecuteFacebookRequest(request, _token, "get");
 
             //Converting this shit to JSON array of SerializedFeed
             feedResult = Regex.Replace(feedResult, "^{\"\\d+\":{", @"[{");
@@ -460,9 +330,8 @@ namespace uFeed.DAL.SocialService.Services.Facebook
                         {
                             Count = post.Likes.Summary.Total_count,
                             IsLiked = post.Likes.Summary.Has_liked,
-                            Url =
-                                "https://graph.facebook.com/v2.7/" + post.Id + "/likes?access_token=" +
-                                _session["FacebookAccessToken"]
+                            Url = "https://graph.facebook.com/v2.7/" + post.Id + 
+                                "/likes?access_token=" + _token
                         },
                         Attachments = attachments
                     });
@@ -471,24 +340,20 @@ namespace uFeed.DAL.SocialService.Services.Facebook
             return result;
         }
 
-        private void CheckAccessToken()
-        {
-            if (_session["FacebookAccessToken"] == null)
-                throw new FacebookException("Access token is absent (relogin please).", true);
-        }
-
         private string Login(string code)
         {
             AccessToken accessToken;
+
             try {
-                var accessTokenJson = Request.SendGetRequest(FacebookGetAccesstoken,
+                string accessTokenJson = Request.SendGetRequest(FacebookGetAccesstoken,
                     $"client_id={AppId}&redirect_uri={RedirectUrl}&client_secret={AppSecret}&code={code}");
                 accessToken = _serializer.Deserialize<AccessToken>(accessTokenJson);
             }
             catch(WebException e)
             {
-                throw new FacebookException("Cannot get access token.\n" + e.Message);
+                throw new SocialException("Cannot get access token.\n" + e.Message);
             }
+
             return accessToken.Access_token;
         }
     }
