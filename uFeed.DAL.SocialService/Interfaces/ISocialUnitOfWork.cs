@@ -8,7 +8,7 @@ namespace uFeed.DAL.SocialService.Interfaces
 
         ISocialApi FacebookApi { get; }
 
-        void InitializeVk(string accessToken, string userId, int expiresIn);
+        void InitializeVk(string accessToken, string userId, int expiresIn, HttpSessionStateBase sessionObj);
 
         void InitializeFacebook(string code, HttpSessionStateBase sessionObj);
     }

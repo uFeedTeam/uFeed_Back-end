@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using Newtonsoft.Json.Linq;
+using uFeed.DAL.SocialService.Interfaces;
 using uFeed.DAL.SocialService.Models.VkModel;
 using uFeed.DAL.SocialService.Models.VkModel.Attach;
 using uFeed.Entities;
@@ -13,7 +14,7 @@ using uFeed.Entities.Social.Attach;
 
 namespace uFeed.DAL.SocialService.Services.Vk
 {
-    public class Api
+    public class Api : ISocialApi
     {
 
         public UserInfo User
