@@ -31,6 +31,7 @@ namespace uFeed.WEB.Utils
         {
             _kernel.Bind<IClientProfileService>().To<ClientProfileService>();
             _kernel.Bind<ISocialService>().To<SocialService>();
+            _kernel.Bind<ICategoryService>().To<CategoryService>();
         }
     }
 }

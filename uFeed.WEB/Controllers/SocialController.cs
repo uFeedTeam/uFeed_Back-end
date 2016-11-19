@@ -68,7 +68,9 @@ namespace uFeed.WEB.Controllers
 
             var socialAuthors = authorsVk.Select(authorDTO => new SocialAuthorDTO
             {
-                AuthorId = authorDTO.Id, CategoryId = 1, Source = authorDTO.Source
+                AuthorId = authorDTO.Id,
+                CategoryId = 1,
+                Source = authorDTO.Source
             }).ToList();
 
             var feed1 = _socialService.GetFeed(new CategoryDTO { Id = 1, Authors = socialAuthors }, 1, 2);
@@ -99,7 +101,7 @@ namespace uFeed.WEB.Controllers
         public IHttpActionResult GetAllAuthors(SocialLoginViewModel loginModel)
         {
             LoginSocialNetworks(loginModel);
-            
+
             var model = new GetAuthorsViewModel();
 
             if (false)//todo make normal check
@@ -127,7 +129,7 @@ namespace uFeed.WEB.Controllers
 
             if (false)//todo make normal check
             {
-                List<AuthorDTO> fbAuthorsDto = _socialService.GetAuthors(page,count,Socials.Facebook);
+                List<AuthorDTO> fbAuthorsDto = _socialService.GetAuthors(page, count, Socials.Facebook);
                 model.FacebookAuthors = Mapper.Map<IEnumerable<AuthorViewModel>>(fbAuthorsDto);
             }
 

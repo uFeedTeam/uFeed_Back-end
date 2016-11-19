@@ -13,9 +13,9 @@ namespace uFeed.WEB.ViewModels
         public string Name { get; set; }
 
         [Required]
-        public int UserId { get; set; }
+        public int ClientProfileId { get; set; }
 
-        public ClientProfileViewModel User { get; set; }
+        //public ClientProfileViewModel User { get; set; }
 
         public ICollection<SocialAuthorViewModel> Authors { get; set; }
     }

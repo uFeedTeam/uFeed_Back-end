@@ -9,11 +9,11 @@ namespace uFeed.Entities
         [Required]
         public string Name { get; set; }
 
-        public int UserId { get; set; }
+        public int ClientProfileId { get; set; }
 
-        [ForeignKey(nameof(UserId))]
+        [ForeignKey(nameof(ClientProfileId))]
         public virtual ClientProfile User { get; set; }
 
-        public ICollection<SocialAuthor> Authors { get; set; }
+        public virtual ICollection<SocialAuthor> Authors { get; set; }
     }
 }
