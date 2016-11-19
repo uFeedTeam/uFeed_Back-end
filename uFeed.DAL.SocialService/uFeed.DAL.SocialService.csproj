@@ -30,8 +30,17 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AutoMapper, Version=5.1.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.5.1.1\lib\net45\AutoMapper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -44,11 +53,24 @@
     <Compile Include="Interfaces\ISocialApi.cs" />
     <Compile Include="Interfaces\ISocialException.cs" />
     <Compile Include="Interfaces\ISocialUnitOfWork.cs" />
+    <Compile Include="Models\VkModel\Attach\VkAnswer.cs" />
+    <Compile Include="Models\VkModel\Attach\VkAttachment.cs" />
+    <Compile Include="Models\VkModel\Attach\VkAudio.cs" />
+    <Compile Include="Models\VkModel\Attach\VkDoc.cs" />
+    <Compile Include="Models\VkModel\Attach\VkDocPhoto.cs" />
+    <Compile Include="Models\VkModel\Attach\VkDocPhotoSize.cs" />
+    <Compile Include="Models\VkModel\Attach\VkLink.cs" />
+    <Compile Include="Models\VkModel\Attach\VkPhoto.cs" />
+    <Compile Include="Models\VkModel\Attach\VkPoll.cs" />
+    <Compile Include="Models\VkModel\Attach\VkPreview.cs" />
+    <Compile Include="Models\VkModel\Attach\VkVideo.cs" />
+    <Compile Include="Models\VkModel\VkGroup.cs" />
+    <Compile Include="Models\VkModel\VkLikes.cs" />
+    <Compile Include="Models\VkModel\VkWallPost.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\FacebookModel\" />
-    <Folder Include="Models\VkModel\" />
     <Folder Include="Services\Facebook\" />
     <Folder Include="Services\Vk\" />
     <Folder Include="UnitOfWorks\" />
@@ -58,6 +80,9 @@
       <Project>{FC24E123-C79F-45B8-82CC-E2F15EDED34A}</Project>
       <Name>uFeed.Entities</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
