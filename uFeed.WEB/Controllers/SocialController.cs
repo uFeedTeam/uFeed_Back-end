@@ -1,8 +1,14 @@
-﻿using System.Linq;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Web.Http;
+using AutoMapper;
 using uFeed.BLL.DTO;
+using uFeed.BLL.DTO.Social;
 using uFeed.BLL.Enums;
 using uFeed.BLL.Interfaces;
+using uFeed.WEB.ViewModels;
+using uFeed.WEB.ViewModels.Social;
 using uFeed.WEB.ViewModels.Social.Login;
 
 namespace uFeed.WEB.Controllers
@@ -86,6 +92,52 @@ namespace uFeed.WEB.Controllers
                     loginModel.VkLogin.ExpiresIn,
                     loginModel.VkLogin.UserId);
             }
+        }
+
+        [HttpPost]
+        [Route("authors")]
+        public IHttpActionResult GetAllAuthors(SocialLoginViewModel loginModel)
+        {
+            LoginSocialNetworks(loginModel);
+            
+            var model = new GetAuthorsViewModel();
+
+            if (false)//todo make normal check
+            {
+                List<AuthorDTO> fbAuthorsDto = _socialService.GetAllAuthors(Socials.Facebook);
+                model.FacebookAuthors = Mapper.Map<IEnumerable<AuthorViewModel>>(fbAuthorsDto);
+            }
+
+            if (true)
+            {
+                List<AuthorDTO> vkAuthorsDto = _socialService.GetAllAuthors(Socials.Vk);
+                model.VkAuthors = Mapper.Map<IEnumerable<AuthorViewModel>>(vkAuthorsDto);
+            }
+
+            return Json(model);
+        }
+
+        [HttpPost]
+        [Route("authors/{page}/{count}")]
+        public IHttpActionResult GetAuthors(SocialLoginViewModel loginModel, int page, int count)
+        {
+            LoginSocialNetworks(loginModel);
+
+            var model = new GetAuthorsViewModel();
+
+            if (false)//todo make normal check
+            {
+                List<AuthorDTO> fbAuthorsDto = _socialService.GetAuthors(page,count,Socials.Facebook);
+                model.FacebookAuthors = Mapper.Map<IEnumerable<AuthorViewModel>>(fbAuthorsDto);
+            }
+
+            if (true)
+            {
+                List<AuthorDTO> vkAuthorsDto = _socialService.GetAuthors(page, count, Socials.Vk);
+                model.VkAuthors = Mapper.Map<IEnumerable<AuthorViewModel>>(vkAuthorsDto);
+            }
+
+            return Json(model);
         }
     }
 }

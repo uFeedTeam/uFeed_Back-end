@@ -259,6 +259,7 @@
     <Compile Include="Utils\NinjectDependencyResolver.cs" />
     <Compile Include="ViewModels\CategoryViewModel.cs" />
     <Compile Include="ViewModels\ClientProfileViewModel.cs" />
+    <Compile Include="ViewModels\GetAuthorsViewModel.cs" />
     <Compile Include="ViewModels\SocialAuthorViewModel.cs" />
     <Compile Include="ViewModels\Social\Attach\AlbumViewModel.cs" />
     <Compile Include="ViewModels\Social\Attach\AttachmentViewModel.cs" />
