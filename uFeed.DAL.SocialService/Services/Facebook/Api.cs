@@ -188,7 +188,7 @@ namespace uFeed.DAL.SocialService.Services.Facebook
 
                 for (count = 1; count <= category.Authors.Count; count++)
                 {
-                    ids += category.Authors.ElementAt(count-1).Id + ",";
+                    ids += category.Authors.ElementAt(count-1).AuthorId + ",";
 
                     if (count%10 == 0)
                     {
@@ -244,7 +244,7 @@ namespace uFeed.DAL.SocialService.Services.Facebook
 
                 for (count = 1; count <= category.Authors.Count; count++)
                 {
-                    ids += category.Authors.ElementAt(count - 1).Id + ",";
+                    ids += category.Authors.ElementAt(count - 1).AuthorId + ",";
                     if (count % 10 == 0)
                     {
                         serializedResult.AddRange(ExecuteFeedRequest(ids.Substring(0, ids.Length - 1), countPosts, offset));
@@ -270,7 +270,7 @@ namespace uFeed.DAL.SocialService.Services.Facebook
                     ids = string.Empty;
                     for (count = 1; count <= category.Authors.Count; count++)
                     {
-                        ids += category.Authors.ElementAt(count - 1).Id + ",";
+                        ids += category.Authors.ElementAt(count - 1).AuthorId + ",";
                         if (count % 10 == 0)
                         {
                             serializedResult
