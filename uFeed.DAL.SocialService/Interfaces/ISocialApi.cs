@@ -10,12 +10,16 @@ namespace uFeed.DAL.SocialService.Interfaces
 
         List<Author> GetAllAuthors();
 
-        List<Author> GetAuthors(int count);
+        List<Author> GetAuthors(int page, int count);
 
-        void GetNextAuthors(List<Author> authors);
+        //List<Author> GetAuthors(int count);
 
-        List<Post> GetFeed(Category category, int countPosts);
+        //void GetNextAuthors(List<Author> authors);
 
-        void GetNextFeed(List<Post> feed);
+        List<Post> GetFeed(Category category, int page, int count);
+
+        //List<Post> GetFeed(Category category, int countPosts);
+
+        //void GetNextFeed(List<Post> feed);
     }
 }

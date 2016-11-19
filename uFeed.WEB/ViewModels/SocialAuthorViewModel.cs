@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using uFeed.BLL.Enums;
 
 namespace uFeed.WEB.ViewModels
 {
@@ -11,5 +12,8 @@ namespace uFeed.WEB.ViewModels
 
         [Required]
         public int CategoryId { get; set; }
+
+        [Required]
+        public Socials Source { get; set; }
     }
 }

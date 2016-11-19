@@ -40,6 +40,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -70,14 +71,20 @@
     <Compile Include="Infrastructure\Exceptions\ServiceException.cs" />
     <Compile Include="Infrastructure\Exceptions\ValidationException.cs" />
     <Compile Include="Infrastructure\ServiceModule.cs" />
+    <Compile Include="Interfaces\ISocialService.cs" />
     <Compile Include="Interfaces\IClientProfileService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\SocialService.cs" />
     <Compile Include="Services\ClientProfileService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\uFeed.DAL.SocialService\uFeed.DAL.SocialService.csproj">
+      <Project>{9D99AF09-6F9B-4C34-9CA0-9BAC2D0E7B80}</Project>
+      <Name>uFeed.DAL.SocialService</Name>
+    </ProjectReference>
     <ProjectReference Include="..\uFeed.DAL\uFeed.DAL.csproj">
       <Project>{db273d72-6262-4763-a660-aa3482d23e60}</Project>
       <Name>uFeed.DAL</Name>
