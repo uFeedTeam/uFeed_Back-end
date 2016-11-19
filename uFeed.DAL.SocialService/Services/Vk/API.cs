@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using Newtonsoft.Json.Linq;
+using uFeed.DAL.SocialService.Exceptions;
 using uFeed.DAL.SocialService.Interfaces;
 using uFeed.DAL.SocialService.Models.VkModel;
 using uFeed.DAL.SocialService.Models.VkModel.Attach;
@@ -16,77 +17,12 @@ namespace uFeed.DAL.SocialService.Services.Vk
 {
     public class Api : ISocialApi
     {
+        public UserInfo User { get; set; }
+        public string AccessToken { get; set; }
+        public long AccessTokenExpiresIn { get; set; }
 
-        public UserInfo User
+        public Api(string accessToken, string userId, int expiresIn)
         {
-            get{ return (UserInfo)_sessionState["vkUser"]; }
-            set { _sessionState["vkUser"] = value; }
-        }
-        public string AccessToken
-        {
-            get { return (string)_sessionState["vkAccessToken"]; }
-            set { _sessionState["vkAccessToken"] = value; }
-        }
-        public long AccessTokenExpiresIn
-        {
-            get { return (long)_sessionState["vkAccessTokenExpiresIn"]; }
-            set { _sessionState["vkAccessTokenExpiresIn"] = value; }
-        }
-
-        private int CountAuthorsStep
-        {
-            get
-            {
-                if(_sessionState["vkCountAuthorStep"] != null)
-                    return (int)_sessionState["vkCountAuthorStep"];
-                return 0;
-            }
-            set { _sessionState["vkCountAuthorStep"] = value; }
-        }
-        private int CountAuthorsOffset
-        {
-            get
-            {
-                if(_sessionState["vkAccessTokenExpiresIn"] != null) 
-                    return (int)_sessionState["vkAccessTokenExpiresIn"];
-                return 0;
-            }
-            set { _sessionState["vkAccessTokenExpiresIn"] = value; }
-        }
-
-        private int CountFeedStep
-        {
-            get
-            {
-                if(_sessionState["vkCountFeedStep"] != null)
-                    return (int)_sessionState["vkCountFeedStep"];
-                return 0;
-            }
-            set { _sessionState["vkCountFeedStep"] = value; }
-        }
-        private int CountFeedOffset
-        {
-            get
-            {
-                if(_sessionState["vkCountFeedOffset"]!=null)
-                    return (int)_sessionState["vkCountFeedOffset"];
-                return 0;
-            }
-            set { _sessionState["vkCountFeedOffset"] = value; }
-        }
-        private List<Author> CurrentAuthorList
-        {
-            get { return (List<Author>)_sessionState["vkCurrentAuthorList"]; }
-            set { _sessionState["vkCurrentAuthorList"] = value; }
-        }
-
-        private readonly HttpSessionStateBase _sessionState;
-
-
-        public Api(string accessToken, string userId, int expiresIn, HttpSessionStateBase sessionState)
-        {
-            _sessionState = sessionState;
-
             AccessToken = accessToken;
             AccessTokenExpiresIn = expiresIn;
         
@@ -101,121 +37,60 @@ namespace uFeed.DAL.SocialService.Services.Vk
         public List<Author> GetAllAuthors()
         {
             string requestString = $"https://api.vk.com/method/groups.get?owner_id={User.Id}&access_token={AccessToken}&extended=1";
-            JToken token = MakeRequest(requestString);
-            token = token["response"];
-
-            var vkGroupList = token.Children().Skip(1).Select(c => c.ToObject<VkGroup>()).ToList();
-
-            return ConvertToGeneralAuthorList(vkGroupList);
-
-        }
-
-        public List<Author> GetAuthors(int countAuthors)
-        {
-            CountAuthorsStep = countAuthors;
-
-            string requestString = $"https://api.vk.com/method/groups.get?owner_id={User.Id}&access_token={AccessToken}&extended=1&count={countAuthors}";
             var token = MakeRequest(requestString);
             token = token["response"];
 
-            var vkGroupList = token.Children().Skip(1).Select(c => c.ToObject<VkGroup>()).ToList();
+            List<VkGroup> vkGroupList = token.Children().Skip(1).Select(c => c.ToObject<VkGroup>()).ToList();
 
             return ConvertToGeneralAuthorList(vkGroupList);
-
         }
 
-        public void GetNextAuthors(List<Author> authorList)
+        public List<Author> GetAuthors(int page, int count)
         {
-            if (CountAuthorsStep == 0)
+            if (page < 1 || count < 1)
             {
-                throw new Exception("User GetAuthors() before GetNextAuthors()");
+                throw new SocialException("Invalid page or elements count");
             }
-            CountAuthorsOffset += CountAuthorsStep;
 
             string requestString =
-                $"https://api.vk.com/method/groups.get?owner_id={User.Id}&access_token={AccessToken}&extended=1&count={CountAuthorsStep}&offset={CountAuthorsOffset}";
+               $@"https://api.vk.com/method/groups.get?owner_id={User.Id}&access_token={AccessToken}&extended=1&count={count}&offset={(page-1)*count}";
             var token = MakeRequest(requestString);
             token = token["response"];
+            List<VkGroup> vkGroupList = token.Children().Skip(1).Select(c => c.ToObject<VkGroup>()).ToList();
 
-            var vkGroupList = token.Children().Skip(1).Select(c => c.ToObject<VkGroup>()).ToList();
-
-            authorList.AddRange(ConvertToGeneralAuthorList(vkGroupList));
-
+            return ConvertToGeneralAuthorList(vkGroupList);
         }
 
-        public List<Post> GetFeed(Category category, int countPosts)
+        public List<Post> GetFeed(Category category, int page, int count)
         {
-            CountFeedStep = countPosts;
-            //CurrentAuthorList = category.Authors.ToList();
-
-            foreach (var author in category.Authors)
+            if (page < 1 || count < 1)
             {
-                CurrentAuthorList.Add(new Author {Id = author.AuthorId});
+                throw new SocialException("Invalid page or elements count");
             }
-             
+            
             var vkFeed = new List<VkWallPost>();
-            var authorsCount = CurrentAuthorList.Count;
+            var authorsCount = category.Authors.Count;
             var authorsOffset = 0;
 
             while (authorsCount > 0)
             {
+                vkFeed.AddRange(GetFeedLess25(category.Authors.ToList(), count, page - 1, 25, authorsOffset));
                 if (authorsCount > 25)
-                {
-                    vkFeed.AddRange(GetFeedLess25(CurrentAuthorList, countPosts, 0, 25, authorsOffset));
+                {        
                     authorsCount -= 25;
                     authorsOffset += 25;
                 }
                 else
                 {
-                    vkFeed.AddRange(GetFeedLess25(CurrentAuthorList, countPosts, 0, authorsCount, authorsOffset));
                     authorsOffset += authorsCount;
                     authorsCount = 0;
                 }
             }
 
-            return ConvertToGeneralPostList(vkFeed);
+            return ConvertToGeneralPostList(vkFeed);           
         }
 
-        public void GetNextFeed(List<Post> feed)
-        {
-            if (CountFeedStep == 0)
-            {
-                throw new Exception("User GetFeed() before GetNextFeed()");
-            }
-            CountFeedOffset += CountFeedStep;
-
-            List<VkWallPost> vkFeed = new List<VkWallPost>();
-            int authorsCount = CurrentAuthorList.Count;
-            int authorsOffset = 0;
-
-            while (authorsCount > 0)
-            {
-                if (authorsCount > 25)
-                {
-                    vkFeed.AddRange(GetFeedLess25(CurrentAuthorList, CountFeedStep, CountFeedOffset, 25, authorsOffset));
-                    authorsCount -= 25;
-                    authorsOffset += 25;
-                }
-                else
-                {
-                    vkFeed.AddRange(GetFeedLess25(CurrentAuthorList, CountFeedStep, CountFeedOffset, authorsCount, authorsOffset));
-                    authorsOffset += authorsCount;
-                    authorsCount = 0;
-                }
-            }
-
-            var generalFeed = ConvertToGeneralPostList(vkFeed);
-
-            foreach (var post in generalFeed)
-            {
-                if (feed.Exists(x => x.Id.Equals(post.Id)))
-                    generalFeed.Remove(post);
-            }
-
-            feed.AddRange(generalFeed);
-        }
-
-        private static List<Author> ConvertToGeneralAuthorList(List<VkGroup> vkGroupList)
+        private static List<Author> ConvertToGeneralAuthorList(IReadOnlyList<VkGroup> vkGroupList)
         {
             var authorList = new List<Author>();
 
@@ -236,7 +111,7 @@ namespace uFeed.DAL.SocialService.Services.Vk
             return authorList;
         }
 
-        private List<Post> ConvertToGeneralPostList(List<VkWallPost> vkFeed)
+        private List<Post> ConvertToGeneralPostList(IEnumerable<VkWallPost> vkFeed)
         {
             var generalFeed = new List<Post>();
 
@@ -256,16 +131,13 @@ namespace uFeed.DAL.SocialService.Services.Vk
                     }
                 };
 
+                List<Author> currentAuthorList = GetAllAuthors();
+
                 try
                 {
-                    if (vkPost.FromId[0].Equals('-'))
-                    {
-                        generalPost.Author = CurrentAuthorList.First(x => x.Id.Equals(vkPost.FromId.Substring(1)));
-                    }
-                    else
-                    {
-                        generalPost.Author = CurrentAuthorList.First(x => x.Id.Equals(vkPost.FromId));
-                    }
+                    generalPost.Author = vkPost.FromId[0].Equals('-') ? 
+                        currentAuthorList.First(x => x.Id.Equals(vkPost.FromId.Substring(1))) : 
+                        currentAuthorList.First(x => x.Id.Equals(vkPost.FromId));
                 }
                 catch (InvalidOperationException)
                 {
@@ -381,7 +253,7 @@ namespace uFeed.DAL.SocialService.Services.Vk
             return linkAttach;
         }
 
-        private static Attachment MakeAlbumAttachment(List<Attachment> photoAttachmentList)
+        private static Attachment MakeAlbumAttachment(IReadOnlyList<Attachment> photoAttachmentList)
         {
             var attach = new Attachment
             {
@@ -412,7 +284,7 @@ namespace uFeed.DAL.SocialService.Services.Vk
             };
         }
 
-        private List<Attachment> MakeAttachmnetList(VkAttachment[] vkAttachmentList)
+        private static List<Attachment> MakeAttachmnetList(IEnumerable<VkAttachment> vkAttachmentList)
         {
             var attachmentList = new List<Attachment>();
             var photoAttachmentList = new List<Attachment>();
@@ -443,7 +315,7 @@ namespace uFeed.DAL.SocialService.Services.Vk
 
             if (photoAttachmentList.Count == 1)
             {
-                attachmentList.Add(new Attachment()
+                attachmentList.Add(new Attachment
                 {
                     Type = "Photo",
                     Title = photoAttachmentList[0].Title,
@@ -458,9 +330,9 @@ namespace uFeed.DAL.SocialService.Services.Vk
             return attachmentList;
         }
 
-        private IEnumerable<VkWallPost> GetFeedLess25(List<Author> authors, int countPosts,int feedOffset, int countAuthors, int authorsOffset)
+        private IEnumerable<VkWallPost> GetFeedLess25(List<SocialAuthor> authors, int countPosts,int feedOffset, int countAuthors, int authorsOffset)
         {
-            string executeMethodText = GetExecuteMethodTextForFeed(authors.GetRange(0 + authorsOffset, countAuthors),
+            var executeMethodText = GetExecuteMethodTextForFeed(authors.GetRange(0 + authorsOffset, countAuthors),
                 countPosts, feedOffset);   
             string requestString =
                 $"https://api.vk.com/method/execute?v=5.52&access_token={AccessToken}&code={executeMethodText}";
@@ -470,9 +342,7 @@ namespace uFeed.DAL.SocialService.Services.Vk
             var vkFeed = new List<VkWallPost>();
             FillFeedFromJTooken(vkFeed, tokenArr);
 
-            //getFeedTest(vkFeed, countPosts);
             return vkFeed;
-
         }
 
         private static void FillFeedFromJTooken(List<VkWallPost> vkGroupList, IEnumerable<JToken> tokenArr)
@@ -486,10 +356,10 @@ namespace uFeed.DAL.SocialService.Services.Vk
             }
             catch (InvalidOperationException)
             {
-                int validElementCounter = 1;
+                var validElementCounter = 1;
                 List<JToken> tempList;
 
-                int counter = 26;
+                var counter = 26;
                 while (counter-- != 0)
                 {
                     try
@@ -501,7 +371,7 @@ namespace uFeed.DAL.SocialService.Services.Vk
                     {
                         tempList = tokenArr.Take(validElementCounter - 1).Skip(1).ToList();
 
-                        foreach (JToken jtoken in tempList)
+                        foreach (var jtoken in tempList)
                         {
                             vkGroupList.Add(jtoken.ToObject<VkWallPost>());
                         }
@@ -511,13 +381,10 @@ namespace uFeed.DAL.SocialService.Services.Vk
             }
         }
 
-        private static string GetExecuteMethodTextForFeed(List<Author> authors, int countPosts, int feedOffset)
+        private static string GetExecuteMethodTextForFeed(IEnumerable<SocialAuthor> authors, int countPosts, int feedOffset)
         {
-            var rez = "var posts = {};";
-            for (int i = 0; i < authors.Count; i++)
-            {
-                rez += "posts.push(API.wall.get({ \"count\": " + countPosts + ", \"owner_id\":-" + authors[i].Id + ", \"offset\":" + feedOffset + " }));";
-            }
+            var rez = authors.Aggregate(@"var posts = {};", 
+                (current, t) => current + ("posts.push(API.wall.get({ \"count\": " + countPosts + ", \"owner_id\":-" + t.AuthorId + ", \"offset\":" + feedOffset) + " }));");
             return rez += "return posts;";
         }
 
@@ -551,21 +418,5 @@ namespace uFeed.DAL.SocialService.Services.Vk
         {
             return new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(linuxDateTime);
         }
-
-        #region Tests
-        private void GetFeedTest(List<VkWallPost> feedList, int countPosts)
-        {
-            var feedDict = new Dictionary<string, int>();
-
-            foreach (var wallPost in feedList)
-            {
-                int tempValue;
-                feedDict.TryGetValue(wallPost.FromId, out tempValue);
-                feedDict[wallPost.FromId] = ++tempValue;
-            }
-
-            var problemFeed = feedDict.Where(elem => elem.Value != countPosts).ToDictionary(elem => elem.Key, elem => elem.Value);
-        }
-        #endregion
     }
 }
