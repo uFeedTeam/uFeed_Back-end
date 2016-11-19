@@ -4,7 +4,9 @@ using System.IO;
 using System.Net;
 using System.Web;
 using System.Web.Http;
+using AutoMapper;
 using Microsoft.AspNet.Identity;
+using uFeed.BLL.DTO;
 using uFeed.BLL.Enums;
 using uFeed.BLL.Infrastructure.Exceptions;
 using uFeed.BLL.Interfaces;
@@ -42,11 +44,15 @@ namespace uFeed.WEB.Controllers
             return StatusCode(HttpStatusCode.OK);
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("get")]
         public IHttpActionResult Get()
         {
-            return Json(_clientProfileService.Get(User.Identity.GetUserId<int>()));
+            var userDto = _clientProfileService.Get(User.Identity.GetUserId<int>());
+
+            var userViewModel = Mapper.Map<ClientProfileViewModel>(userDto);
+
+            return Ok(userViewModel);
         }
 
         [HttpPost]
