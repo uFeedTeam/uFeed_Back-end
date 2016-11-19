@@ -44,6 +44,26 @@
     <Compile Include="Interfaces\ISocialApi.cs" />
     <Compile Include="Interfaces\ISocialException.cs" />
     <Compile Include="Interfaces\ISocialUnitOfWork.cs" />
+    <Compile Include="Models\FacebookModel\AccessToken.cs" />
+    <Compile Include="Models\FacebookModel\Common\Paging.cs" />
+    <Compile Include="Models\FacebookModel\Common\Picture\Picture.cs" />
+    <Compile Include="Models\FacebookModel\Common\Picture\PictureData.cs" />
+    <Compile Include="Models\FacebookModel\Feed\Attachment.cs" />
+    <Compile Include="Models\FacebookModel\Feed\AttachmentsCollection.cs" />
+    <Compile Include="Models\FacebookModel\Feed\Description_tag.cs" />
+    <Compile Include="Models\FacebookModel\Feed\Image.cs" />
+    <Compile Include="Models\FacebookModel\Feed\Like.cs" />
+    <Compile Include="Models\FacebookModel\Feed\Likes.cs" />
+    <Compile Include="Models\FacebookModel\Feed\LikesSummary.cs" />
+    <Compile Include="Models\FacebookModel\Feed\Media.cs" />
+    <Compile Include="Models\FacebookModel\Feed\Post.cs" />
+    <Compile Include="Models\FacebookModel\Feed\PostsCollection.cs" />
+    <Compile Include="Models\FacebookModel\Feed\SerializedFeed.cs" />
+    <Compile Include="Models\FacebookModel\Feed\Target.cs" />
+    <Compile Include="Models\FacebookModel\Likes\Group.cs" />
+    <Compile Include="Models\FacebookModel\Likes\GroupsCollection.cs" />
+    <Compile Include="Models\FacebookModel\Likes\SerializedLikes.cs" />
+    <Compile Include="Models\FacebookModel\User\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
