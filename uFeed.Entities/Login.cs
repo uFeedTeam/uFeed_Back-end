@@ -1,6 +1,6 @@
-﻿using uFeed.DAL.Enums;
+﻿using uFeed.Entities.Enums;
 
-namespace uFeed.DAL.Entities
+namespace uFeed.Entities
 {
     public class Login : BaseType
     {

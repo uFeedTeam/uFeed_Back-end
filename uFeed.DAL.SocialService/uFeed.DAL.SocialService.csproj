@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{36E2E796-0D94-4947-8FBE-31D78A00535E}</ProjectGuid>
+    <ProjectGuid>{9D99AF09-6F9B-4C34-9CA0-9BAC2D0E7B80}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>uFeed.BLL</RootNamespace>
-    <AssemblyName>uFeed.BLL</AssemblyName>
+    <RootNamespace>uFeed.DAL.SocialService</RootNamespace>
+    <AssemblyName>uFeed.DAL.SocialService</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,16 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AutoMapper, Version=5.1.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoMapper.5.1.1\lib\net45\AutoMapper.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Ninject, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -48,46 +41,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DTO\CategoryDTO.cs" />
-    <Compile Include="DTO\ClientProfileDTO.cs" />
-    <Compile Include="DTO\SocialAuthorDTO.cs" />
-    <Compile Include="DTO\Social\Attach\AlbumDTO.cs" />
-    <Compile Include="DTO\Social\Attach\AttachmentDTO.cs" />
-    <Compile Include="DTO\Social\Attach\DocumentDTO.cs" />
-    <Compile Include="DTO\Social\Attach\LikesDTO.cs" />
-    <Compile Include="DTO\Social\Attach\LinkDTO.cs" />
-    <Compile Include="DTO\Social\Attach\PollAnswerDTO.cs" />
-    <Compile Include="DTO\Social\Attach\PollDTO.cs" />
-    <Compile Include="DTO\Social\Attach\VideoDTO.cs" />
-    <Compile Include="DTO\Social\AuthorDTO.cs" />
-    <Compile Include="DTO\Social\PhotoDTO.cs" />
-    <Compile Include="DTO\Social\PostDTO.cs" />
-    <Compile Include="DTO\Social\UserInfoDTO.cs" />
-    <Compile Include="Enums\Socials.cs" />
-    <Compile Include="Infrastructure\AutomapperProfiles\DTOToEntityProfile.cs" />
-    <Compile Include="Infrastructure\AutomapperProfiles\EntityToDTOProfile.cs" />
-    <Compile Include="Infrastructure\Exceptions\EntityNotFoundException.cs" />
-    <Compile Include="Infrastructure\Exceptions\ServiceException.cs" />
-    <Compile Include="Infrastructure\Exceptions\ValidationException.cs" />
-    <Compile Include="Infrastructure\ServiceModule.cs" />
-    <Compile Include="Interfaces\IClientProfileService.cs" />
+    <Compile Include="Interfaces\ISocialApi.cs" />
+    <Compile Include="Interfaces\ISocialException.cs" />
+    <Compile Include="Interfaces\ISocialUnitOfWork.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\ClientProfileService.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <Folder Include="Models\FacebookModel\" />
+    <Folder Include="Models\VkModel\" />
+    <Folder Include="Services\Facebook\" />
+    <Folder Include="Services\Vk\" />
+    <Folder Include="UnitOfWorks\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\uFeed.DAL\uFeed.DAL.csproj">
-      <Project>{db273d72-6262-4763-a660-aa3482d23e60}</Project>
-      <Name>uFeed.DAL</Name>
-    </ProjectReference>
     <ProjectReference Include="..\uFeed.Entities\uFeed.Entities.csproj">
       <Project>{FC24E123-C79F-45B8-82CC-E2F15EDED34A}</Project>
       <Name>uFeed.Entities</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

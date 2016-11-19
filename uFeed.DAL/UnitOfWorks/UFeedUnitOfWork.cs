@@ -1,8 +1,8 @@
 ﻿using System;
 using uFeed.DAL.EF;
-using uFeed.DAL.Entities;
 using uFeed.DAL.Interfaces;
 using uFeed.DAL.Repositories;
+using uFeed.Entities;
 
 namespace uFeed.DAL.UnitOfWorks
 {

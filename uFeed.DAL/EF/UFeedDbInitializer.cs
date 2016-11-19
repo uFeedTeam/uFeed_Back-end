@@ -1,5 +1,5 @@
 ﻿using System.Data.Entity;
-using uFeed.DAL.Entities;
+using uFeed.Entities;
 
 namespace uFeed.DAL.EF
 {

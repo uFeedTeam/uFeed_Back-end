@@ -5,8 +5,8 @@ using uFeed.BLL.DTO;
 using uFeed.BLL.Enums;
 using uFeed.BLL.Infrastructure.Exceptions;
 using uFeed.BLL.Interfaces;
-using uFeed.DAL.Entities;
 using uFeed.DAL.Interfaces;
+using uFeed.Entities;
 
 namespace uFeed.BLL.Services
 {
@@ -80,7 +80,7 @@ namespace uFeed.BLL.Services
                 throw new EntityNotFoundException("Cannot find client profile", "ClientProfile");
             }
 
-            var dalType = (DAL.Enums.Socials) type;
+            var dalType = (Entities.Enums.Socials)type;
 
             if (clientProfile.Logins == null)
             {
@@ -105,7 +105,7 @@ namespace uFeed.BLL.Services
                 throw new EntityNotFoundException("Cannot find client profile", "ClientProfile");
             }
 
-            var dalType = (DAL.Enums.Socials)type;
+            var dalType = (Entities.Enums.Socials)type;
 
             if (clientProfile.Logins != null && 
                 clientProfile.Logins.Select(l => l.LoginType).Contains(dalType))

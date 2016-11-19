@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace uFeed.DAL.Entities
+namespace uFeed.Entities
 {
     public class ClientProfile : BaseType
     {

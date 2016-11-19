@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace uFeed.DAL.Entities.Social.Attach
+namespace uFeed.Entities.Social.Attach
 {
     public class Poll
     {

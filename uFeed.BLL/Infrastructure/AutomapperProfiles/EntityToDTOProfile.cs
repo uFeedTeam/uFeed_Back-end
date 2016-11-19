@@ -2,7 +2,7 @@
 using AutoMapper;
 using uFeed.BLL.DTO;
 using uFeed.BLL.Enums;
-using uFeed.DAL.Entities;
+using uFeed.Entities;
 
 namespace uFeed.BLL.Infrastructure.AutomapperProfiles
 {

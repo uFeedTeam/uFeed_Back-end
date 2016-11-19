@@ -1,4 +1,4 @@
-﻿namespace uFeed.DAL.Entities.Social
+﻿namespace uFeed.Entities.Social
 {
     public class Photo
     {

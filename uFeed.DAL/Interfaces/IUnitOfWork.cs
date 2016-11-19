@@ -1,5 +1,5 @@
 ﻿using System;
-using uFeed.DAL.Entities;
+using uFeed.Entities;
 
 namespace uFeed.DAL.Interfaces
 {

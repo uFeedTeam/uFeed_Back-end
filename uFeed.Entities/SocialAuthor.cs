@@ -1,4 +1,4 @@
-﻿namespace uFeed.DAL.Entities
+﻿namespace uFeed.Entities
 {
     public class SocialAuthor : BaseType
     {

@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace uFeed.DAL.Entities
+namespace uFeed.Entities
 {
     public class Category : BaseType
     {

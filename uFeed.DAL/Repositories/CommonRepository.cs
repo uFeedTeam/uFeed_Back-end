@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Data.Entity;
 using System.Linq;
-using uFeed.DAL.Entities;
 using uFeed.DAL.Interfaces;
+using uFeed.Entities;
 
 namespace uFeed.DAL.Repositories
 {

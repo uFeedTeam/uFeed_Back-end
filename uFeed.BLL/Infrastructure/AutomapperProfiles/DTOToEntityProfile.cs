@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using uFeed.BLL.DTO;
-using uFeed.DAL.Entities;
+using uFeed.Entities;
 
 namespace uFeed.BLL.Infrastructure.AutomapperProfiles
 {

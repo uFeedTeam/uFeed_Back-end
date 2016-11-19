@@ -1,4 +1,4 @@
-﻿namespace uFeed.DAL.Entities.Social.Attach
+﻿namespace uFeed.Entities.Social.Attach
 {
     public class Document
     {

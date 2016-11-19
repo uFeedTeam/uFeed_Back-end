@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using uFeed.DAL.Entities.Social.Attach;
+using uFeed.Entities.Social.Attach;
 
-namespace uFeed.DAL.Entities.Social
+namespace uFeed.Entities.Social
 {
     public class Post
     {
