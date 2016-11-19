@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using AutoMapper;
 using uFeed.BLL.DTO;
 using uFeed.BLL.DTO.Social;
@@ -24,16 +23,18 @@ namespace uFeed.BLL.Services
             _unitOfWork = unitOfWork;
         }
 
-        public void Login(string socialNetwork, string codeOrAccessToken, HttpSessionStateBase session, int? expiresIn = null, string userId = null)
+        public void Login(Socials socialNetwork, string codeOrAccessToken, int? expiresIn = null, string userId = null)
         {
             switch (socialNetwork)
             {
-                case "vk":
+                case Socials.Vk:
                     if (expiresIn != null)
-                        _socialUnitOfWork.InitializeVk(codeOrAccessToken, userId, (int)expiresIn, session);
+                    {
+                        _socialUnitOfWork.InitializeVk(codeOrAccessToken, userId, (int)expiresIn);
+                    }
                     break;
-                case "facebook":
-                    _socialUnitOfWork.InitializeFacebook(codeOrAccessToken, session);
+                case Socials.Facebook:
+                    _socialUnitOfWork.InitializeFacebook(codeOrAccessToken);
                     break;
             }
         }
@@ -60,16 +61,16 @@ namespace uFeed.BLL.Services
             return mapper.Map<IEnumerable<UserInfoDTO>>(userInfoes).ToList();
         }
 
-        public List<AuthorDTO> GetAllAuthors(string socialNetwork)
+        public List<AuthorDTO> GetAllAuthors(Socials socialNetwork)
         {
             var authors = new List<Author>();
 
             switch (socialNetwork)
             {
-                case "vk":
+                case Socials.Vk:
                     authors.AddRange(_socialUnitOfWork.VkApi.GetAllAuthors());
                     break;
-                case "facebook":
+                case Socials.Facebook:
                     authors.AddRange(_socialUnitOfWork.FacebookApi.GetAllAuthors());
                     break;
             }
@@ -77,42 +78,24 @@ namespace uFeed.BLL.Services
             return Mapper.Map<IEnumerable<AuthorDTO>>(authors).ToList();
         }
 
-        public List<AuthorDTO> GetAuthors(int count, Socials socialNetwork)
+        public List<AuthorDTO> GetAuthors(int page, int count, Socials socialNetwork)
         {
             var authors = new List<Author>();
 
             switch (socialNetwork)
             {
                 case Socials.Vk:
-                    authors.AddRange(_socialUnitOfWork.VkApi.GetAuthors(count));
+                    authors.AddRange(_socialUnitOfWork.VkApi.GetAuthors(page, count));
                     break;
                 case Socials.Facebook:
-                    authors.AddRange(_socialUnitOfWork.FacebookApi.GetAuthors(count));
+                    authors.AddRange(_socialUnitOfWork.FacebookApi.GetAuthors(page, count));
                     break;
             }
 
             return Mapper.Map<IEnumerable<AuthorDTO>>(authors).ToList();
         }
 
-        public void GetNextAuthors(List<AuthorDTO> authorsDto, Socials socialNetwork)
-        {
-            var authors = Mapper.Map<IEnumerable<Author>>(authorsDto).ToList();
-
-            switch (socialNetwork)
-            {
-                case Socials.Vk:
-                    _socialUnitOfWork.VkApi.GetNextAuthors(authors);
-                    break;
-                case Socials.Facebook:
-                    _socialUnitOfWork.FacebookApi.GetNextAuthors(authors);
-                    break;
-            }
-            authorsDto.Clear();
-
-            authorsDto.AddRange(Mapper.Map<IEnumerable<AuthorDTO>>(authors));
-        }
-
-        public List<PostDTO> GetFeed(CategoryDTO categoryDto, int countPosts)
+        public List<PostDTO> GetFeed(CategoryDTO categoryDto, int page, int countPosts)
         {
             var category = Mapper.Map<Category>(categoryDto);
 
@@ -123,7 +106,8 @@ namespace uFeed.BLL.Services
                 Id = category.Id,
                 Name = category.Name,
                 User = category.User,
-                Authors = category.Authors.Where(x => x.Source == Entities.Enums.Socials.Facebook).ToList()
+                Authors = category.Authors
+                    .Where(x => x.Source == Entities.Enums.Socials.Facebook).ToList()
             };
 
             var vkCategory = new Category
@@ -131,32 +115,14 @@ namespace uFeed.BLL.Services
                 Id = category.Id,
                 Name = category.Name,
                 User = category.User,
-                Authors = category.Authors.Where(x => x.Source == Entities.Enums.Socials.Vk).ToList()
+                Authors = category.Authors
+                    .Where(x => x.Source == Entities.Enums.Socials.Vk).ToList()
             };
 
-            feed.AddRange(_socialUnitOfWork.FacebookApi.GetFeed(fbCategory, countPosts));
-            feed.AddRange(_socialUnitOfWork.VkApi.GetFeed(vkCategory, countPosts));
+            feed.AddRange(_socialUnitOfWork.FacebookApi.GetFeed(fbCategory, page, countPosts));
+            //feed.AddRange(_socialUnitOfWork.VkApi.GetFeed(vkCategory, page, countPosts)); //todo uncomment
 
             return Mapper.Map<IEnumerable<PostDTO>>(feed).ToList();
-        }
-
-        public void GetNextFeed(List<PostDTO> feedDTO)
-        {
-            var feed = Mapper.Map<IEnumerable<Post>>(feedDTO).ToList();
-
-            var fbFeed = feed.Where(x => x.Author.Source == Entities.Enums.Socials.Facebook).ToList();
-            var vkFeed = feed.Where(x => x.Author.Source == Entities.Enums.Socials.Vk).ToList();
-
-            _socialUnitOfWork.FacebookApi.GetNextFeed(fbFeed);
-            _socialUnitOfWork.VkApi.GetNextFeed(vkFeed);
-
-            feed.Clear();
-
-            feed.AddRange(vkFeed);
-            feed.AddRange(fbFeed);
-
-            feedDTO.Clear();
-            feedDTO.AddRange(Mapper.Map<IEnumerable<PostDTO>>(feed).ToList());
         }
 
         public void Dispose()

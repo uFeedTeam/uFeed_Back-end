@@ -10,6 +10,7 @@ using uFeed.DAL.SocialService.Interfaces;
 using uFeed.DAL.SocialService.Models.VkModel;
 using uFeed.DAL.SocialService.Models.VkModel.Attach;
 using uFeed.Entities;
+using uFeed.Entities.Enums;
 using uFeed.Entities.Social;
 using uFeed.Entities.Social.Attach;
 
@@ -104,7 +105,8 @@ namespace uFeed.DAL.SocialService.Services.Vk
                     {
                         Url = vkGroupList[i].Photo
                     },
-                    Url = "http://vk.com/" + vkGroupList[i].ScreenName
+                    Url = "http://vk.com/" + vkGroupList[i].ScreenName,
+                    Source = Socials.Vk
                 });
             }
 
@@ -332,6 +334,7 @@ namespace uFeed.DAL.SocialService.Services.Vk
 
         private IEnumerable<VkWallPost> GetFeedLess25(List<SocialAuthor> authors, int countPosts,int feedOffset, int countAuthors, int authorsOffset)
         {
+            //todo index out of range here
             var executeMethodText = GetExecuteMethodTextForFeed(authors.GetRange(0 + authorsOffset, countAuthors),
                 countPosts, feedOffset);   
             string requestString =
@@ -399,6 +402,7 @@ namespace uFeed.DAL.SocialService.Services.Vk
             User.Id = token["uid"].ToString();
             User.Name = token["first_name"] + " " + token["last_name"];
             User.Photo = new Photo { Url = token["photo_100"].ToString() };
+            User.Source = Socials.Vk;
         }
 
         private static JToken MakeRequest(string requestString)

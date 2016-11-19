@@ -19,6 +19,7 @@ namespace uFeed.BLL.Infrastructure.AutomapperProfiles
                 dto.Logins = source.Logins.Select(l => (Socials)l.LoginType).ToList();
             });
             CreateMap<Category, CategoryDTO>();
+            CreateMap<SocialAuthor, SocialAuthorDTO>();
 
             CreateMap<Author, AuthorDTO>();
             CreateMap<Photo, PhotoDTO>();

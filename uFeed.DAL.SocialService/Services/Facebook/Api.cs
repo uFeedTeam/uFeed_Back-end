@@ -183,6 +183,7 @@ namespace uFeed.DAL.SocialService.Services.Facebook
                 result.Id = user.Id;
                 result.Name = user.Name;
                 result.Photo = new Photo {Url = user.Picture.Data.Url};
+                result.Source = Socials.Facebook;
             }
             catch (WebException e)
             {
@@ -305,7 +306,7 @@ namespace uFeed.DAL.SocialService.Services.Facebook
                                                 ? new Photo {Url = fbAttach.Media.Image.Src}
                                                 : null,
                                         Extension = "gif",
-                                        Size = 0 //TODO check is it neccessary
+                                        Size = 0
                                     };
                                     break;
                             }

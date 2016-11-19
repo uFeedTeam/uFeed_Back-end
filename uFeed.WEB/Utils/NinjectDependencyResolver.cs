@@ -30,6 +30,7 @@ namespace uFeed.WEB.Utils
         private void AddBindings()
         {
             _kernel.Bind<IClientProfileService>().To<ClientProfileService>();
+            _kernel.Bind<ISocialService>().To<SocialService>();
         }
     }
 }

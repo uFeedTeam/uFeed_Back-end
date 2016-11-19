@@ -1,5 +1,4 @@
-﻿using System.Web;
-using uFeed.DAL.SocialService.Interfaces;
+﻿using uFeed.DAL.SocialService.Interfaces;
 
 namespace uFeed.DAL.SocialService.UnitOfWorks
 {
@@ -9,14 +8,14 @@ namespace uFeed.DAL.SocialService.UnitOfWorks
 
         public ISocialApi FacebookApi { get; set; }
 
-        public void InitializeVk(string accessToken, string userId, int expiresIn, HttpSessionStateBase sessionObj)
+        public void InitializeVk(string accessToken, string userId, int expiresIn)
         {
-            VkApi = new Services.Vk.Api(accessToken, userId, expiresIn, sessionObj);
+            VkApi = new Services.Vk.Api(accessToken, userId, expiresIn);
         }
 
-        public void InitializeFacebook(string code, HttpSessionStateBase sessionObj)
+        public void InitializeFacebook(string code)
         {
-            FacebookApi = new Services.Facebook.Api(code, sessionObj);
+            FacebookApi = new Services.Facebook.Api(code);
         }
     }
 }

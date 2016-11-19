@@ -14,6 +14,7 @@ namespace uFeed.BLL.Infrastructure.AutomapperProfiles
         {
             CreateMap<ClientProfileDTO, ClientProfile>();
             CreateMap<CategoryDTO, Category>();
+            CreateMap<SocialAuthorDTO, SocialAuthor>();
 
             CreateMap<AuthorDTO, Author>();
             CreateMap<PhotoDTO, Photo>();

@@ -8,19 +8,15 @@ namespace uFeed.BLL.Interfaces
 {
     public interface ISocialService
     {
-        void Login(string socialNetwork, string codeOrAccessToken, HttpSessionStateBase session, int? expiresIn = null, string userId = null);
+        void Login(Socials socialNetwork, string codeOrAccessToken, int? expiresIn = null, string userId = null);
 
         List<UserInfoDTO> GetUserInfo();
 
-        List<AuthorDTO> GetAllAuthors(string socialNetwork);
+        List<AuthorDTO> GetAllAuthors(Socials socialNetwork);
 
-        List<AuthorDTO> GetAuthors(int count, Socials socialNetwork);
+        List<AuthorDTO> GetAuthors(int page, int count, Socials socialNetwork);
 
-        void GetNextAuthors(List<AuthorDTO> authors, Socials socialNetwork);
-
-        List<PostDTO> GetFeed(CategoryDTO category, int countPosts);
-
-        void GetNextFeed(List<PostDTO> feedDTO);
+        List<PostDTO> GetFeed(CategoryDTO category, int page, int countPosts);
 
         void Dispose();
     }

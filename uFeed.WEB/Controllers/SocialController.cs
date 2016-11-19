@@ -1,10 +1,14 @@
-﻿using System;
+﻿using System.Linq;
 using System.Web.Http;
+using uFeed.BLL.DTO;
+using uFeed.BLL.Enums;
 using uFeed.BLL.Interfaces;
+using uFeed.WEB.ViewModels.Social.Login;
 
 namespace uFeed.WEB.Controllers
 {
-    [Authorize]
+    //[Authorize]
+    [RoutePrefix("api/social")]
     public class SocialController : ApiController
     {
         private readonly ISocialService _socialService;
@@ -17,6 +21,8 @@ namespace uFeed.WEB.Controllers
         private const string CLIENT_ID = "5494787";
         private const string REDIRECT_URI = "https://oauth.vk.com/blank.html";
 
+        [HttpGet]
+        [Route("vkauth")]
         public IHttpActionResult AuthenticationVk()
         {
             string url =
@@ -28,7 +34,8 @@ namespace uFeed.WEB.Controllers
         private const string RedirectUri = "https://109.87.37.50/";
         private const string Permissions = "user_likes,user_posts,user_managed_groups";
 
-
+        [HttpGet]
+        [Route("fbauth")]
         public IHttpActionResult AuthenticationFb()
         {
             string url =
@@ -36,28 +43,49 @@ namespace uFeed.WEB.Controllers
             return Redirect(url);
         }
 
-        public IHttpActionResult Login(string accessFb, string accessVk, string id, int? expiresIn)
+        [HttpPost]
+        public IHttpActionResult Test(SocialLoginViewModel loginModel)
         {
-            _socialService.Login("vk", accessVk, Session, expiresIn, id);
-            _socialService.Login("facebook", accessFb + "#", Session);
+            LoginSocialNetworks(loginModel);
 
-            var userInfoes = _feedService.GetUserInfo();
-            var authorsVkAll = _feedService.GetAllAuthors("vk");
-            var authorsFacebookAll = _feedService.GetAllAuthors("facebook");
+            var userInfoes = _socialService.GetUserInfo();
+            var authorsVkAll = _socialService.GetAllAuthors(Socials.Vk);
+            var authorsFacebookAll = _socialService.GetAllAuthors(Socials.Facebook);
 
-            var authorsVk = _feedService.GetAuthors(10, "vk");
-            var authorsFacebook = _feedService.GetAuthors(10, "facebook");
+            var authorsVk = _socialService.GetAuthors(1, 10, Socials.Vk);
+            var authorsFacebook = _socialService.GetAuthors(1, 10, Socials.Facebook);
 
-            _feedService.GetNextAuthors(authorsVk, "vk");
-            _feedService.GetNextAuthors(authorsFacebook, "facebook");
+            authorsVk = _socialService.GetAuthors(2, 10, Socials.Vk);
+            authorsFacebook = _socialService.GetAuthors(2, 10, Socials.Facebook);
 
             authorsVk.AddRange(authorsFacebook);
 
-            var feed = _feedService.GetFeed(new CategoryDTO { Authors = authorsVk }, 2);
+            var socialAuthors = authorsVk.Select(authorDTO => new SocialAuthorDTO
+            {
+                AuthorId = authorDTO.Id, CategoryId = 1, Source = authorDTO.Source
+            }).ToList();
 
-            _feedService.GetNextFeed(feed);
+            var feed1 = _socialService.GetFeed(new CategoryDTO { Id = 1, Authors = socialAuthors }, 1, 2);
 
-            return View("Index", _feedService.GetUserInfo());
+            var feed2 = _socialService.GetFeed(new CategoryDTO { Id = 1, Authors = socialAuthors }, 2, 2);
+
+            return Ok();
+        }
+
+        private void LoginSocialNetworks(SocialLoginViewModel loginModel)
+        {
+            if (loginModel.FacebookLogin != null)
+            {
+                _socialService.Login(Socials.Facebook, loginModel.FacebookLogin.Code);
+            }
+
+            if (loginModel.VkLogin != null)
+            {
+                _socialService.Login(Socials.Vk,
+                    loginModel.VkLogin.AccessToken,
+                    loginModel.VkLogin.ExpiresIn,
+                    loginModel.VkLogin.UserId);
+            }
         }
     }
 }
