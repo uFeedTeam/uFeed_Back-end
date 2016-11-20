@@ -42,7 +42,7 @@ namespace uFeed.WEB
         {
             var modules = new INinjectModule[]
             {
-                new ServiceModule("uFeedContext")
+                new ServiceModule("RemoteContext")
             };
             var kernel = new StandardKernel(modules);
             try
