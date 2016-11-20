@@ -23,19 +23,56 @@ namespace uFeed.BLL.Services
             _unitOfWork = unitOfWork;
         }
 
-        public void Login(Socials socialNetwork, string codeOrAccessToken, int? expiresIn = null, string userId = null)
+        public void Login(Socials socialNetwork, string codeOrAccessToken, string userId, bool isAccessToken = false)
         {
             switch (socialNetwork)
             {
                 case Socials.Vk:
-                    if (expiresIn != null)
+                    if (isAccessToken)
                     {
-                        _socialUnitOfWork.InitializeVk(codeOrAccessToken, userId, (int)expiresIn);
+                        _socialUnitOfWork.InitializeVk(codeOrAccessToken, userId, null);
+                    }
+                    else
+                    {
+                        _socialUnitOfWork.InitializeVk(null, userId, codeOrAccessToken);
                     }
                     break;
                 case Socials.Facebook:
-                    _socialUnitOfWork.InitializeFacebook(codeOrAccessToken);
+                    if (isAccessToken)
+                    {
+                        _socialUnitOfWork.InitializeFacebook(codeOrAccessToken, null);
+                    }
+                    else
+                    {
+                        _socialUnitOfWork.InitializeFacebook(null, codeOrAccessToken);
+                    }
                     break;
+            }
+        }
+
+        public string GetToken(Socials socialNetwork)
+        {
+            switch (socialNetwork)
+            {
+                case Socials.Vk:
+                    return _socialUnitOfWork.VkApi.GetToken();
+                case Socials.Facebook:
+                    return _socialUnitOfWork.FacebookApi.GetToken();
+                default:
+                    return null;
+            }
+        }
+
+        public string GetUserId(Socials socialNetwork)
+        {
+            switch (socialNetwork)
+            {
+                case Socials.Vk:
+                    return _socialUnitOfWork.VkApi.GetUserId();
+                case Socials.Facebook:
+                    return _socialUnitOfWork.FacebookApi.GetUserId();
+                default:
+                    return null;
             }
         }
 
@@ -105,20 +142,12 @@ namespace uFeed.BLL.Services
 
             var fbCategory = new Category
             {
-                Id = category.Id,
-                Name = category.Name,
-                User = category.User,
-                Authors = category.Authors
-                    .Where(x => x.Source == Entities.Enums.Socials.Facebook).ToList()
+                Id = category.Id, Name = category.Name, User = category.User, Authors = category.Authors.Where(x => x.Source == Entities.Enums.Socials.Facebook).ToList()
             };
 
             var vkCategory = new Category
             {
-                Id = category.Id,
-                Name = category.Name,
-                User = category.User,
-                Authors = category.Authors
-                    .Where(x => x.Source == Entities.Enums.Socials.Vk).ToList()
+                Id = category.Id, Name = category.Name, User = category.User, Authors = category.Authors.Where(x => x.Source == Entities.Enums.Socials.Vk).ToList()
             };
 
             var feed = new List<Post>();

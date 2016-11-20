@@ -1,12 +1,10 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Web;
 using System.Web.Http;
 using AutoMapper;
 using Microsoft.AspNet.Identity;
-using uFeed.BLL.DTO;
 using uFeed.BLL.Enums;
 using uFeed.BLL.Infrastructure.Exceptions;
 using uFeed.BLL.Interfaces;

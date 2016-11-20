@@ -1,11 +1,13 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 using AutoMapper;
+using Microsoft.AspNet.Identity;
 using uFeed.BLL.DTO;
 using uFeed.BLL.DTO.Social;
 using uFeed.BLL.Enums;
+using uFeed.BLL.Infrastructure.Exceptions;
 using uFeed.BLL.Interfaces;
 using uFeed.WEB.ViewModels;
 using uFeed.WEB.ViewModels.Social;
@@ -13,40 +15,50 @@ using uFeed.WEB.ViewModels.Social.Login;
 
 namespace uFeed.WEB.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [RoutePrefix("api/social")]
     public class SocialController : ApiController
     {
         private readonly ISocialService _socialService;
+        private readonly ICategoryService _categoryService;
+        private readonly IClientProfileService _clientProfileService;
 
-        public SocialController(ISocialService socialService)
+        public SocialController(ISocialService socialService, ICategoryService categoryService, IClientProfileService clientProfileService)
         {
             _socialService = socialService;
+            _categoryService = categoryService;
+            _clientProfileService = clientProfileService;
         }
-
-        private const string ClientId = "5494787";
-        private const string RedirectUrl = "https://oauth.vk.com/blank.html";
 
         [HttpGet]
         [Route("vkauth")]
-        public IHttpActionResult AuthenticationVk()
+        [AllowAnonymous]
+        public IHttpActionResult AuthenticationVk(string code)
         {
-            string url =
-                $"https://oauth.vk.com/authorize?client_id={ClientId}&display=popup&redirect_uri={RedirectUrl}&scope=groups,audio&response_type=token&v=5.52";
-            return Redirect(url);
-        }
+            _socialService.Login(Socials.Vk, code);
 
-        private const string AppId = "141340716272867";
-        private const string RedirectUri = "https://109.87.37.50/";
-        private const string Permissions = "user_likes,user_posts,user_managed_groups";
+            var vkLogin = new VkLoginViewModel
+            {
+                AccessToken = _socialService.GetToken(Socials.Vk),
+                UserId = _socialService.GetUserId(Socials.Vk)
+            };
+
+            return Ok(vkLogin);
+        }
 
         [HttpGet]
         [Route("fbauth")]
-        public IHttpActionResult AuthenticationFb()
+        [AllowAnonymous]
+        public IHttpActionResult AuthenticationFb(string code)
         {
-            string url =
-                $"https://www.facebook.com/dialog/oauth?client_id={AppId}&redirect_uri={RedirectUri}&scope={Permissions}";
-            return Redirect(url);
+            _socialService.Login(Socials.Facebook, code + "#");
+
+            var facebookLogin = new FacebookLoginViewModel
+            {
+                AccessToken = _socialService.GetToken(Socials.Facebook)
+            };
+
+            return Ok(facebookLogin);
         }
 
         [HttpPost]
@@ -80,22 +92,6 @@ namespace uFeed.WEB.Controllers
             return Ok();
         }
 
-        private void LoginSocialNetworks(SocialLoginViewModel loginModel)
-        {
-            if (loginModel.FacebookLogin != null)
-            {
-                _socialService.Login(Socials.Facebook, loginModel.FacebookLogin.Code);
-            }
-
-            if (loginModel.VkLogin != null)
-            {
-                _socialService.Login(Socials.Vk,
-                    loginModel.VkLogin.AccessToken,
-                    loginModel.VkLogin.ExpiresIn,
-                    loginModel.VkLogin.UserId);
-            }
-        }
-
         [HttpPost]
         [Route("authors")]
         public IHttpActionResult GetAllAuthors(SocialLoginViewModel loginModel)
@@ -104,15 +100,17 @@ namespace uFeed.WEB.Controllers
 
             var model = new GetAuthorsViewModel();
 
-            if (false)//todo make normal check
+            var clientProfile = _clientProfileService.Get(User.Identity.GetUserId<int>());
+
+            if (clientProfile.Logins.Contains(Socials.Facebook))
             {
-                List<AuthorDTO> fbAuthorsDto = _socialService.GetAllAuthors(Socials.Facebook);
+                var fbAuthorsDto = _socialService.GetAllAuthors(Socials.Facebook);
                 model.FacebookAuthors = Mapper.Map<IEnumerable<AuthorViewModel>>(fbAuthorsDto);
             }
 
-            if (true)
+            if (clientProfile.Logins.Contains(Socials.Vk))
             {
-                List<AuthorDTO> vkAuthorsDto = _socialService.GetAllAuthors(Socials.Vk);
+                var vkAuthorsDto = _socialService.GetAllAuthors(Socials.Vk);
                 model.VkAuthors = Mapper.Map<IEnumerable<AuthorViewModel>>(vkAuthorsDto);
             }
 
@@ -123,23 +121,69 @@ namespace uFeed.WEB.Controllers
         [Route("authors/{page}/{count}")]
         public IHttpActionResult GetAuthors(SocialLoginViewModel loginModel, int page, int count)
         {
+            try
+            {
+                LoginSocialNetworks(loginModel);
+
+                var model = new GetAuthorsViewModel();
+
+                var clientProfile = _clientProfileService.Get(User.Identity.GetUserId<int>());
+
+                if (clientProfile.Logins.Contains(Socials.Facebook))
+                {
+                    List<AuthorDTO> fbAuthorsDto = _socialService.GetAuthors(page, count, Socials.Facebook);
+                    model.FacebookAuthors = Mapper.Map<IEnumerable<AuthorViewModel>>(fbAuthorsDto);
+                }
+
+                if (clientProfile.Logins.Contains(Socials.Vk))
+                {
+                    List<AuthorDTO> vkAuthorsDto = _socialService.GetAuthors(page, count, Socials.Vk);
+                    model.VkAuthors = Mapper.Map<IEnumerable<AuthorViewModel>>(vkAuthorsDto);
+                }
+
+                return Json(model);
+            }
+            catch (Exception ex)
+            {               
+                return BadRequest(ex.ToString());
+            }            
+        }
+
+        [HttpPost]
+        [Route("feed/{categoryId}/{page}/{postsPerGroup}")]
+        public IHttpActionResult GetFeed(SocialLoginViewModel loginModel, int categoryId, int page, int postsPerGroup)
+        {
             LoginSocialNetworks(loginModel);
 
-            var model = new GetAuthorsViewModel();
-
-            if (false)//todo make normal check
+            try
             {
-                List<AuthorDTO> fbAuthorsDto = _socialService.GetAuthors(page, count, Socials.Facebook);
-                model.FacebookAuthors = Mapper.Map<IEnumerable<AuthorViewModel>>(fbAuthorsDto);
+                var categoryDto = _categoryService.Get(categoryId);
+                var feed = _socialService.GetFeed(categoryDto, page, postsPerGroup);
+
+                return Json(feed);
+            }
+            catch (EntityNotFoundException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {               
+                return BadRequest(ex.ToString());
+            }
+}
+
+
+        private void LoginSocialNetworks(SocialLoginViewModel loginModel)
+        {
+            if (loginModel.FacebookLogin != null)
+            {
+                _socialService.Login(Socials.Facebook, loginModel.FacebookLogin.AccessToken, isAccessToken: true);
             }
 
-            if (true)
+            if (loginModel.VkLogin != null)
             {
-                List<AuthorDTO> vkAuthorsDto = _socialService.GetAuthors(page, count, Socials.Vk);
-                model.VkAuthors = Mapper.Map<IEnumerable<AuthorViewModel>>(vkAuthorsDto);
+                _socialService.Login(Socials.Vk, loginModel.VkLogin.AccessToken, loginModel.VkLogin.UserId, true);
             }
-
-            return Json(model);
         }
     }
 }

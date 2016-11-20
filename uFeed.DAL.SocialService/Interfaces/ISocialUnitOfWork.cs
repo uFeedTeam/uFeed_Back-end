@@ -6,8 +6,8 @@
 
         ISocialApi FacebookApi { get; }
 
-        void InitializeVk(string accessToken, string userId, int expiresIn);
+        void InitializeVk(string accessToken, string userId, string code);
 
-        void InitializeFacebook(string code);
+        void InitializeFacebook(string token, string code);
     }
 }

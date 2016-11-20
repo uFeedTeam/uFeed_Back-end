@@ -2,6 +2,6 @@
 {
     public class FacebookLoginViewModel
     {
-        public string Code { get; set; }
+        public string AccessToken { get; set; }
     }
 }

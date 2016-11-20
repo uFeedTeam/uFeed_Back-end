@@ -27,6 +27,11 @@ namespace uFeed.DAL.EF
             .HasMany(a => a.Categories)
             .WithRequired(a => a.User)
             .WillCascadeOnDelete(true);
+
+            modelBuilder.Entity<Category>()
+            .HasMany(a => a.Authors)
+            .WithRequired(a => a.Category)
+            .WillCascadeOnDelete(true);
         }
     }
 }

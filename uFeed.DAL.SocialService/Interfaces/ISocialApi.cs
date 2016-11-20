@@ -6,6 +6,10 @@ namespace uFeed.DAL.SocialService.Interfaces
 {
     public interface ISocialApi
     {
+        string GetToken();
+
+        string GetUserId();
+
         UserInfo GetUserInfo();
 
         List<Author> GetAllAuthors();

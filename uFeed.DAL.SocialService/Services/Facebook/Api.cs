@@ -23,25 +23,17 @@ namespace uFeed.DAL.SocialService.Services.Facebook
     public class Api : ISocialApi
     {       
         private const string FacebookGetAccesstoken = "https://graph.facebook.com/v2.7/oauth/access_token";
-        private const string FacebookOauth = "https://www.facebook.com/dialog/oauth";
         private const string AppId = "141340716272867";
-        private const string RedirectUrl = "https://109.87.37.50/";
+        private const string RedirectUrl = "http://ufeed.azurewebsites.net/api/social/fbauth";
         private const string AppSecret = "18715401fbc856779f25f04595d7b20f";
-        private const string Permissions = "user_likes,user_posts,user_managed_groups";
 
         private readonly string _token;
         private readonly JavaScriptSerializer _serializer;
 
-        public Api(string code)
+        public Api(string token, string code)
         {
             _serializer = new JavaScriptSerializer();
-            _token = Login(code);
-        }
-
-        public static string GetCodeLink()
-        {
-            return
-                $"{FacebookOauth}?client_id={AppId}&redirect_uri={RedirectUrl}&scope={Permissions}";
+            _token = token ?? Login(code);
         }
 
         public List<Author> GetAllAuthors()
@@ -167,7 +159,17 @@ namespace uFeed.DAL.SocialService.Services.Facebook
             }
 
             return result;
-        }        
+        }
+
+        public string GetToken()
+        {
+            return _token;
+        }
+
+        public string GetUserId()
+        {
+            return string.Empty;
+        }
 
         public UserInfo GetUserInfo()
         {

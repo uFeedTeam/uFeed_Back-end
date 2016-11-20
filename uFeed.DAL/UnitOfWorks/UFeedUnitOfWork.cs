@@ -11,20 +11,23 @@ namespace uFeed.DAL.UnitOfWorks
         private readonly UFeedContext _db;
         private bool _disposed;
 
-        private IRepository<ClientProfile> _clientProfileRepository;
+        private ClientProfileRepository _clientProfileRepository;
         private IRepository<Category> _categoryRepository;
         private IRepository<Login> _loginRepository;
+        private IRepository<SocialAuthor> _socialAuthorRepository;
 
         public UFeedUnitOfWork(string connectionString)
         {
             _db = new UFeedContext(connectionString);
         }
 
-        public IRepository<ClientProfile> ClientProfiles => _clientProfileRepository ?? (_clientProfileRepository = new CommonRepository<ClientProfile>(_db));
+        public ClientProfileRepository ClientProfiles => _clientProfileRepository ?? (_clientProfileRepository = new ClientProfileRepository(_db));
 
         public IRepository<Category> Categories => _categoryRepository ?? (_categoryRepository = new CommonRepository<Category>(_db));
 
         public IRepository<Login> Logins => _loginRepository ?? (_loginRepository = new CommonRepository<Login>(_db));
+
+        public IRepository<SocialAuthor> SocialAuthors => _socialAuthorRepository ?? (_socialAuthorRepository = new CommonRepository<SocialAuthor>(_db));
 
         public void Save()
         {

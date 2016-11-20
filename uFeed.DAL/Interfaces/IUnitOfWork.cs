@@ -1,15 +1,18 @@
 ﻿using System;
+using uFeed.DAL.Repositories;
 using uFeed.Entities;
 
 namespace uFeed.DAL.Interfaces
 {
     public interface IUnitOfWork : IDisposable
     {
-        IRepository<ClientProfile> ClientProfiles { get; }
+        ClientProfileRepository ClientProfiles { get; }
 
         IRepository<Category> Categories { get; }
 
         IRepository<Login> Logins { get; }
+
+        IRepository<SocialAuthor> SocialAuthors { get; }
 
         void Save();
     }

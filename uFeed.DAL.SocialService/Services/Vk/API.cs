@@ -18,26 +18,76 @@ namespace uFeed.DAL.SocialService.Services.Vk
 {
     public class Api : ISocialApi
     {
-        public UserInfo User { get; set; }
+        public string UserId { get; set; }
         public string AccessToken { get; set; }
         public long AccessTokenExpiresIn { get; set; }
 
-        public Api(string accessToken, string userId, int expiresIn)
+        public Api(string token, string userId, string code)
         {
-            AccessToken = accessToken;
-            AccessTokenExpiresIn = expiresIn;
-        
-            FormUserInfo(userId);
+            if (!string.IsNullOrEmpty(token))
+            {
+                AccessToken = token;
+                UserId = userId;
+            }
+            else
+            {
+                UserId = GetTokenAndUserId(code);
+            }   
+        }
+
+        private string GetTokenAndUserId(string code)
+        {
+            var url =
+                $@"https://oauth.vk.com/access_token?client_id=5494787&client_secret=8GmVpN3SZCUlnTHzYD3o&redirect_uri=http://ufeed.azurewebsites.net/api/social/vkauth&code={code}";
+            var req = WebRequest.Create(url);
+            var resp = req.GetResponse();
+
+            var stream = resp.GetResponseStream();
+            if (stream == null)
+            {
+                throw new SocialException("Cannot get response stream");
+            }
+
+            var sr = new StreamReader(stream);
+            var streamText = sr.ReadToEnd();
+            sr.Close();
+
+            AccessToken = streamText.Split(':')[1].Split(',')[0].Trim('\"');
+            var userId = streamText.Split(':')[3].Trim('}');
+
+            return userId;
+        }
+
+        public string GetToken()
+        {
+            return AccessToken;
+        }
+
+        public string GetUserId()
+        {
+            return UserId;
         }
 
         public UserInfo GetUserInfo()
         {
-            return User;
+            var user = new UserInfo();
+
+            string requestString = $"https://api.vk.com/method/users.get?user_ids={UserId}&access_token={AccessToken}&fields=photo_100";
+            var token = MakeRequest(requestString);
+
+            token = token["response"][0];
+
+            user.Id = token["uid"].ToString();
+            user.Name = token["first_name"] + " " + token["last_name"];
+            user.Photo = new Photo { Url = token["photo_100"].ToString() };
+            user.Source = Socials.Vk;
+
+            return user;
         }
 
         public List<Author> GetAllAuthors()
         {
-            string requestString = $"https://api.vk.com/method/groups.get?owner_id={User.Id}&access_token={AccessToken}&extended=1";
+            string requestString = $"https://api.vk.com/method/groups.get?owner_id={UserId}&access_token={AccessToken}&extended=1";
             var token = MakeRequest(requestString);
             token = token["response"];
 
@@ -54,7 +104,7 @@ namespace uFeed.DAL.SocialService.Services.Vk
             }
 
             string requestString =
-               $@"https://api.vk.com/method/groups.get?owner_id={User.Id}&access_token={AccessToken}&extended=1&count={count}&offset={(page-1)*count}";
+               $@"https://api.vk.com/method/groups.get?owner_id={UserId}&access_token={AccessToken}&extended=1&count={count}&offset={(page-1)*count}";
             var token = MakeRequest(requestString);
             token = token["response"];
             List<VkGroup> vkGroupList = token.Children().Skip(1).Select(c => c.ToObject<VkGroup>()).ToList();
@@ -132,7 +182,7 @@ namespace uFeed.DAL.SocialService.Services.Vk
                         Count = (int) vkPost.Likes.Count,
                         IsLiked = Convert.ToBoolean(vkPost.Likes.UserLikes),
                         Url =
-                            $"https://api.vk.com/method/likes.add?access_token={AccessToken}&type=post&owner_id={User.Id}&item_id={vkPost.Id}"
+                            $"https://api.vk.com/method/likes.add?access_token={AccessToken}&type=post&owner_id={UserId}&item_id={vkPost.Id}"
                     }
                 };
 
@@ -337,8 +387,7 @@ namespace uFeed.DAL.SocialService.Services.Vk
 
         private IEnumerable<VkWallPost> GetFeedLess25(List<SocialAuthor> authors, int countPosts,int feedOffset, int countAuthors, int authorsOffset)
         {
-            //todo index out of range here
-            List<SocialAuthor> offsetedAythorList = authors.GetRange(0 + authorsOffset, countAuthors);
+            var offsetedAythorList = authors.GetRange(0 + authorsOffset, countAuthors);
             var executeMethodText = GetExecuteMethodTextForFeed(offsetedAythorList,countPosts, feedOffset);   
             string requestString =
                 $"https://api.vk.com/method/execute?v=5.52&access_token={AccessToken}&code={executeMethodText}";
@@ -392,20 +441,6 @@ namespace uFeed.DAL.SocialService.Services.Vk
             var rez = authors.Aggregate(@"var posts = {};", 
                 (current, t) => current + ("posts.push(API.wall.get({ \"count\": " + countPosts + ", \"owner_id\":-" + t.AuthorId + ", \"offset\":" + feedOffset) + " }));");
             return rez += "return posts;";
-        }
-
-        private void FormUserInfo(string userId)
-        {
-            User = new UserInfo();
-
-            string requestString = $"https://api.vk.com/method/users.get?user_ids={userId}&access_token={AccessToken}&fields=photo_100";
-            var token = MakeRequest(requestString);
-            token = token["response"][0];
-
-            User.Id = token["uid"].ToString();
-            User.Name = token["first_name"] + " " + token["last_name"];
-            User.Photo = new Photo { Url = token["photo_100"].ToString() };
-            User.Source = Socials.Vk;
         }
 
         private static JToken MakeRequest(string requestString)

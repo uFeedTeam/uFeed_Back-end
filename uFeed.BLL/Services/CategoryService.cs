@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using AutoMapper;
 using uFeed.BLL.DTO;
 using uFeed.BLL.Infrastructure.Exceptions;
@@ -21,6 +22,15 @@ namespace uFeed.BLL.Services
         {
             var category = Mapper.Map<Category>(categoryDto);
 
+            var clientProfile = _unitOfWork.ClientProfiles.GetByUserId(categoryDto.UserId);
+
+            if (clientProfile == null)
+            {
+                throw new EntityNotFoundException($"User with id = {categoryDto.UserId} wasn't found", "ClientProfile");
+            }
+
+            category.ClientProfileId = clientProfile.Id;
+
             _unitOfWork.Categories.Create(category);
             _unitOfWork.Save();
         }
@@ -34,9 +44,14 @@ namespace uFeed.BLL.Services
                 throw new EntityNotFoundException("Category doesn't exist", "Category");
             }
 
+            foreach (var id in updatingCategory.Authors.Select(author => author.Id).ToList())
+            {
+                _unitOfWork.SocialAuthors.Delete(id);
+            }
+
             updatingCategory.Authors.Clear();
             Mapper.Map(categoryDto, updatingCategory);
-            
+
             _unitOfWork.Categories.Update(updatingCategory);
             _unitOfWork.Save();
         }
@@ -67,7 +82,7 @@ namespace uFeed.BLL.Services
 
         public IEnumerable<CategoryDTO> GetByUserId(int userId)
         {
-            var categories = _unitOfWork.Categories.Find(x => x.ClientProfileId == userId);
+            var categories = _unitOfWork.Categories.Find(x => x.User.UserId == userId);
             var categoriesDto = Mapper.Map<IEnumerable<CategoryDTO>>(categories);
 
             return categoriesDto;

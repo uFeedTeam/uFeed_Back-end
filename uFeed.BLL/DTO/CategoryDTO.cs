@@ -13,9 +13,7 @@ namespace uFeed.BLL.DTO
 
         public string Name { get; set; }
 
-        //public ClientProfileDTO User { get; set; }//Commented because of self loop in category
-
-        public int ClientProfileId { get; set; }
+        public int UserId { get; set; }
 
         public ICollection<SocialAuthorDTO> Authors { get; set; }
     }

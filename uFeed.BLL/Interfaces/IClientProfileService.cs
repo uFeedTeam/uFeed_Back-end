@@ -8,16 +8,16 @@ namespace uFeed.BLL.Interfaces
     {
         IEnumerable<ClientProfileDTO> GetAll();
 
-        ClientProfileDTO Get(int id);
+        ClientProfileDTO Get(int userId);
 
         void Create(ClientProfileDTO clientProfileDTO);
 
         void Update(ClientProfileDTO clientProfileDTO);
 
-        void Delete(int id);
+        void Delete(int userId);
 
-        void AddLogin(int clientId, Socials type);
+        void AddLogin(int userId, Socials type);
 
-        void RemoveLogin(int clientId, Socials type);
+        void RemoveLogin(int userId, Socials type);
     }
 }

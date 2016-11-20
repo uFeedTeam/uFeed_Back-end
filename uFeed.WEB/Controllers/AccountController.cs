@@ -342,7 +342,7 @@ namespace uFeed.WEB.Controllers
 
             var clientProfile = new ClientProfileDTO
             {
-                Id = user.Id,
+                UserId = user.Id,
                 Email = user.Email,
                 Name = model.Name
             };
@@ -390,23 +390,28 @@ namespace uFeed.WEB.Controllers
         {
             var user = await UserManager.FindByIdAsync(User.Identity.GetUserId<int>());
 
-            if (user != null)
+            if (user == null)
             {
-                IdentityResult result = await UserManager.DeleteAsync(user);
-                if (result.Succeeded)
-                {
-                    try
-                    {
-                        _clientProfileService.Delete(user.Id);
-                    }
-                    catch(EntityNotFoundException)
-                    {
-                        return BadRequest();
-                    }
-                    return Ok();
-                }
+                return BadRequest();
             }
-            return BadRequest();
+
+            IdentityResult result = await UserManager.DeleteAsync(user);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                _clientProfileService.Delete(user.Id);
+            }
+            catch(EntityNotFoundException)
+            {
+                return BadRequest();
+            }
+
+            return Ok();
         }
 
         protected override void Dispose(bool disposing)

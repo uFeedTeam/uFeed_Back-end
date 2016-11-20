@@ -6,7 +6,7 @@ namespace uFeed.WEB.ViewModels
 {
     public class ClientProfileViewModel
     {
-        public int Id { get; set; }
+        public int UserId { get; set; }
 
         [Required(ErrorMessage = "Name is required")]
         [StringLength(60, MinimumLength = 1, ErrorMessage = "String length has to be in range (1, 60)")]

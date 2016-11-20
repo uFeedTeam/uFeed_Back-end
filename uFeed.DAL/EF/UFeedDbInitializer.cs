@@ -10,6 +10,7 @@ namespace uFeed.DAL.EF
             var clientProfile = new ClientProfile
             {
                 Id = 1,
+                UserId = 1,
                 Email = "qwe@qwe",
                 Name = "qwe"
             };

@@ -27,9 +27,9 @@ namespace uFeed.BLL.Services
             return clientProfilesDTO;
         }
 
-        public ClientProfileDTO Get(int id)
+        public ClientProfileDTO Get(int userId)
         {
-            var clientProfile = _unitOfWork.ClientProfiles.Get(id);
+            var clientProfile = _unitOfWork.ClientProfiles.GetByUserId(userId);
             var clientProfileDTO = Mapper.Map<ClientProfileDTO>(clientProfile);
 
             return clientProfileDTO;
@@ -45,7 +45,7 @@ namespace uFeed.BLL.Services
 
         public void Update(ClientProfileDTO clientProfileDTO)
         {
-            var clientProfile = _unitOfWork.ClientProfiles.Get(clientProfileDTO.Id);
+            var clientProfile = _unitOfWork.ClientProfiles.GetByUserId(clientProfileDTO.UserId);
 
             if (clientProfile == null)
             {
@@ -60,20 +60,22 @@ namespace uFeed.BLL.Services
             _unitOfWork.Save();
         }
 
-        public void Delete(int id)
+        public void Delete(int userId)
         {
-            if (_unitOfWork.ClientProfiles.Get(id) == null)
+            var clientProfile = _unitOfWork.ClientProfiles.GetByUserId(userId);
+
+            if (clientProfile == null)
             {
                 throw new EntityNotFoundException("Cannot find client profile", "ClientProfile");
             }
 
-            _unitOfWork.ClientProfiles.Delete(id);
+            _unitOfWork.ClientProfiles.Delete(clientProfile.Id);
             _unitOfWork.Save();
         }
 
-        public void AddLogin(int clientId, Socials type)
+        public void AddLogin(int userId, Socials type)
         {
-            var clientProfile = _unitOfWork.ClientProfiles.Get(clientId);
+            var clientProfile = _unitOfWork.ClientProfiles.GetByUserId(userId);
 
             if (clientProfile == null)
             {
@@ -89,16 +91,16 @@ namespace uFeed.BLL.Services
 
             if (!clientProfile.Logins.Select(l => l.LoginType).Contains(dalType))
             {
-                clientProfile.Logins.Add(new Login { ClientProfileId = clientId, LoginType = dalType });
+                clientProfile.Logins.Add(new Login { ClientProfileId = clientProfile.Id, LoginType = dalType });
             }
 
             _unitOfWork.ClientProfiles.Update(clientProfile);
             _unitOfWork.Save();
         }
 
-        public void RemoveLogin(int clientId, Socials type)
+        public void RemoveLogin(int userId, Socials type)
         {
-            var clientProfile = _unitOfWork.ClientProfiles.Get(clientId);
+            var clientProfile = _unitOfWork.ClientProfiles.GetByUserId(userId);
 
             if (clientProfile == null)
             {

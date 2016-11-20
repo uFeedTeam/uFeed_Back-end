@@ -8,14 +8,14 @@ namespace uFeed.DAL.SocialService.UnitOfWorks
 
         public ISocialApi FacebookApi { get; set; }
 
-        public void InitializeVk(string accessToken, string userId, int expiresIn)
+        public void InitializeVk(string accessToken, string userId, string code)
         {
-            VkApi = new Services.Vk.Api(accessToken, userId, expiresIn);
+            VkApi = new Services.Vk.Api(accessToken, userId, code);
         }
 
-        public void InitializeFacebook(string code)
+        public void InitializeFacebook(string token, string code)
         {
-            FacebookApi = new Services.Facebook.Api(code);
+            FacebookApi = new Services.Facebook.Api(token, code);
         }
     }
 }

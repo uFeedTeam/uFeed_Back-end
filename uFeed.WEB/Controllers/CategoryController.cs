@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Web.Http;
 using AutoMapper;
 using Microsoft.AspNet.Identity;
@@ -10,7 +9,7 @@ using uFeed.WEB.ViewModels;
 
 namespace uFeed.WEB.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [RoutePrefix("api")]
     public class CategoryController: ApiController
     {
@@ -32,7 +31,7 @@ namespace uFeed.WEB.Controllers
         }
 
         [HttpPost]
-        [Route("category/update")]//todo works incorrect, need some changes
+        [Route("category/update")]
         public IHttpActionResult Update(CategoryViewModel categoryViewModel)
         {
             try

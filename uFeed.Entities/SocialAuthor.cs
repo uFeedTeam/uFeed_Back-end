@@ -9,5 +9,7 @@ namespace uFeed.Entities
         public int CategoryId { get; set; }
 
         public Socials Source { get; set; }
+
+        public virtual Category Category { get; set; }
     }
 }
