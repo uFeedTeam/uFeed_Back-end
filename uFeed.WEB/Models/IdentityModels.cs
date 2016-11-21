@@ -56,13 +56,13 @@ namespace uFeed.WEB.Models
         UserLogin, UserRole, UserClaim>
     {
         public ApplicationDbContext()
-            : base("RemoteContext")
+            : base("AuthContext")
         {
         }
 
         public static ApplicationDbContext Create()
         {
-            //Database.SetInitializer(new AuthDbInitializer());
+            Database.SetInitializer(new AuthDbInitializer());
             return new ApplicationDbContext();
         }
     }
