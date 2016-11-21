@@ -12,7 +12,8 @@ namespace uFeed.BLL.Infrastructure.AutomapperProfiles
     {
         public DTOToEntityProfile()
         {
-            CreateMap<ClientProfileDTO, ClientProfile>();
+            CreateMap<ClientProfileDTO, ClientProfile>()
+                .ForMember(profile => profile.Logins, expression => expression.Ignore());
             CreateMap<CategoryDTO, Category>();
             CreateMap<SocialAuthorDTO, SocialAuthor>();
 
