@@ -88,7 +88,7 @@ namespace uFeed.DAL.SocialService.Services.Facebook
                 }
 
                 string likesResult =
-                    Request.ExecuteFacebookRequest("me/?fields=likes.limit(" + count + ").offset(" + count * page + "){name,id,picture,link}",
+                    Request.ExecuteFacebookRequest("me/?fields=likes.limit(" + count + ").offset(" + count * (page - 1) + "){name,id,picture,link}",
                         _token, "get");
 
                 var likes = _serializer.Deserialize<SerializedLikes>(likesResult);
@@ -141,14 +141,14 @@ namespace uFeed.DAL.SocialService.Services.Facebook
 
                     if (count % 10 == 0)
                     {
-                        serializedResult.AddRange(ExecuteFeedRequest(ids.Substring(0, ids.Length - 1), countPosts, page + countPosts));
+                        serializedResult.AddRange(ExecuteFeedRequest(ids.Substring(0, ids.Length - 1), countPosts, (page - 1) * countPosts));
                         ids = "";
                     }
                 }
 
                 if (count % 10 != 0 && count % 10 - 1 != 0)
                 {
-                    serializedResult.AddRange(ExecuteFeedRequest(ids.Substring(0, ids.Length - 1), countPosts, page + countPosts));
+                    serializedResult.AddRange(ExecuteFeedRequest(ids.Substring(0, ids.Length - 1), countPosts, (page - 1) * countPosts));
                 }
 
                 result = ConvertFeed(serializedResult);

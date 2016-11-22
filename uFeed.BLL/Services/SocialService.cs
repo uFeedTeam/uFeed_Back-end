@@ -93,7 +93,7 @@ namespace uFeed.BLL.Services
                 userInfoes.Add(fbUser);
             }
 
-            if (_socialUnitOfWork.FacebookApi != null)
+            if (_socialUnitOfWork.VkApi != null)
             {
                 var vkUser = _socialUnitOfWork.VkApi.GetUserInfo();
                 userInfoes.Add(vkUser);
@@ -136,29 +136,45 @@ namespace uFeed.BLL.Services
             return Mapper.Map<IEnumerable<AuthorDTO>>(authors).ToList();
         }
 
-        public List<PostDTO> GetFeed(CategoryDTO categoryDto, int page, int countPosts)
+        public List<PostDTO> GetFeed(CategoryDTO categoryDto, int page, int countPosts, Socials[] logins)
         {
             var category = Mapper.Map<Category>(categoryDto);
 
-            var fbCategory = new Category
-            {
-                Id = category.Id, Name = category.Name, User = category.User, Authors = category.Authors.Where(x => x.Source == Entities.Enums.Socials.Facebook).ToList()
-            };
-
-            var vkCategory = new Category
-            {
-                Id = category.Id, Name = category.Name, User = category.User, Authors = category.Authors.Where(x => x.Source == Entities.Enums.Socials.Vk).ToList()
-            };
-
             var feed = new List<Post>();
-            if (fbCategory.Authors.Any())
-            {
-                feed.AddRange(_socialUnitOfWork.FacebookApi.GetFeed(fbCategory, page, countPosts));
-            }
 
-            if (vkCategory.Authors.Any())
+            if (logins == null || logins.Length <= 0)
             {
-                feed.AddRange(_socialUnitOfWork.VkApi.GetFeed(vkCategory, page, countPosts));
+                return Mapper.Map<IEnumerable<PostDTO>>(feed).ToList();
+            }           
+
+            if (logins.Contains(Socials.Facebook))
+            {
+                var fbCategory = new Category
+                {
+                    Id = category.Id,
+                    Name = category.Name,
+                    User = category.User,
+                    Authors = category.Authors.Where(x => x.Source == Entities.Enums.Socials.Facebook).ToList()
+                };
+                if (fbCategory.Authors.Any())
+                {
+                    feed.AddRange(_socialUnitOfWork.FacebookApi.GetFeed(fbCategory, page, countPosts));
+                }
+            }
+            if (logins.Contains(Socials.Vk))
+            {
+                var vkCategory = new Category
+                {
+                    Id = category.Id,
+                    Name = category.Name,
+                    User = category.User,
+                    Authors = category.Authors.Where(x => x.Source == Entities.Enums.Socials.Vk).ToList()
+                };
+
+                if (vkCategory.Authors.Any())
+                {
+                    feed.AddRange(_socialUnitOfWork.VkApi.GetFeed(vkCategory, page, countPosts));
+                }
             }
 
             return Mapper.Map<IEnumerable<PostDTO>>(feed).ToList();

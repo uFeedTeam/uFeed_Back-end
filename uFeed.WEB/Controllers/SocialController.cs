@@ -85,9 +85,9 @@ namespace uFeed.WEB.Controllers
                 Source = authorDTO.Source
             }).ToList();
 
-            var feed1 = _socialService.GetFeed(new CategoryDTO { Id = 1, Authors = socialAuthors }, 1, 2);
+            var feed1 = _socialService.GetFeed(new CategoryDTO { Id = 1, Authors = socialAuthors }, 1, 2, new []{Socials.Facebook, Socials.Vk });
 
-            var feed2 = _socialService.GetFeed(new CategoryDTO { Id = 1, Authors = socialAuthors }, 2, 2);
+            var feed2 = _socialService.GetFeed(new CategoryDTO { Id = 1, Authors = socialAuthors }, 2, 2, new[] { Socials.Facebook, Socials.Vk });
 
             return Ok();
         }
@@ -157,8 +157,9 @@ namespace uFeed.WEB.Controllers
 
             try
             {
+                var client = _clientProfileService.Get(User.Identity.GetUserId<int>());
                 var categoryDto = _categoryService.Get(categoryId);
-                var feed = _socialService.GetFeed(categoryDto, page, postsPerGroup);
+                var feed = _socialService.GetFeed(categoryDto, page, postsPerGroup, client.Logins.ToArray());
 
                 return Json(feed);
             }

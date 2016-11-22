@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Web;
@@ -76,26 +77,33 @@ namespace uFeed.WEB.Controllers
         [Route("newname")]
         public IHttpActionResult EditName([FromBody] ClientProfileViewModel user)
         {
-            var accountId = User.Identity.GetUserId<int>();
-
-            if (string.IsNullOrEmpty(user?.Name))
-            {
-                return StatusCode(HttpStatusCode.BadRequest);
-            }
-
-            var userAccount = _clientProfileService.Get(accountId);
-            userAccount.Name = user.Name;
-
             try
             {
-                _clientProfileService.Update(userAccount);
-            }
-            catch (ServiceException)
-            {
-                return StatusCode(HttpStatusCode.BadRequest);
-            }
+                var accountId = User.Identity.GetUserId<int>();
 
-            return StatusCode(HttpStatusCode.OK);
+                if (string.IsNullOrEmpty(user?.Name))
+                {
+                    return StatusCode(HttpStatusCode.BadRequest);
+                }
+
+                var userAccount = _clientProfileService.Get(accountId);
+                userAccount.Name = user.Name;
+
+                try
+                {
+                    _clientProfileService.Update(userAccount);
+                }
+                catch (ServiceException)
+                {
+                    return StatusCode(HttpStatusCode.BadRequest);
+                }
+
+                return StatusCode(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.ToString());
+            }
         }
 
         [HttpPut]

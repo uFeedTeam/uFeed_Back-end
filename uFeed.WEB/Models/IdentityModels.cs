@@ -62,7 +62,7 @@ namespace uFeed.WEB.Models
 
         public static ApplicationDbContext Create()
         {
-            Database.SetInitializer(new AuthDbInitializer());
+            //Database.SetInitializer(new AuthDbInitializer());
             return new ApplicationDbContext();
         }
     }
