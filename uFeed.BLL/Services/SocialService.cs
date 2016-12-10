@@ -213,9 +213,9 @@ namespace uFeed.BLL.Services
                 var vkBookmarkIds =
                     user.Bookmarks
                         .Where(bookmark => bookmark.Source == Entities.Enums.Socials.Vk)
-                        .Select(bookmark => bookmark.PostId);
-
-                posts.AddRange(_socialUnitOfWork.VkApi.GetPosts(vkBookmarkIds));
+                        .Select(bookmark => bookmark.PostId).ToList();
+                var a = _socialUnitOfWork.VkApi.GetPosts(vkBookmarkIds);
+                posts.AddRange(a);
             }
 
             var resultPosts = Mapper.Map<IEnumerable<PostDTO>>(posts);
