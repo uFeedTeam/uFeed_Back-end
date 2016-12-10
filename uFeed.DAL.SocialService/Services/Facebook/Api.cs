@@ -398,7 +398,8 @@ namespace uFeed.DAL.SocialService.Services.Facebook
                         Id = feed?.Id,
                         Name = feed?.Name,
                         Photo = new Photo {Url = feed.Picture?.Data.Url},
-                        Url = feed?.Link
+                        Url = feed?.Link,
+                        Source = Socials.Facebook
                     };
 
                     if (feed.Id == null)
