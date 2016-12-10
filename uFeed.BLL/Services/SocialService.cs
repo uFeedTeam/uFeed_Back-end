@@ -232,12 +232,22 @@ namespace uFeed.BLL.Services
                 throw new EntityNotFoundException("User cannot be found", "User");
             }
 
+            postId = source == Socials.Vk ? "-" + postId : postId;
+
+            if (_unitOfWork.ClientBookmarks.Find(x => x.PostId.Equals(postId)).Any())
+            {
+                throw new ValidationException("Such post Id already exists", "Id");
+            }
+
             var bookmark = new ClientBookmark
             {
                 ClientProfile = user,
                 PostId = postId,
                 Source = (Entities.Enums.Socials)source
             };
+            
+
+
 
             _unitOfWork.ClientBookmarks.Create(bookmark);
             _unitOfWork.Save();
