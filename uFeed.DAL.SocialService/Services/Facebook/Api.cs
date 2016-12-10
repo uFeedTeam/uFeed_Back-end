@@ -17,6 +17,7 @@ using uFeed.Entities.Social.Attach;
 using Attachment = uFeed.Entities.Social.Attach.Attachment;
 using Likes = uFeed.Entities.Social.Attach.Likes;
 using Post = uFeed.Entities.Social.Post;
+using FacebookPost = uFeed.DAL.SocialService.Models.FacebookModel.Feed.Post;
 
 namespace uFeed.DAL.SocialService.Services.Facebook
 {
@@ -165,7 +166,53 @@ namespace uFeed.DAL.SocialService.Services.Facebook
 
         public List<Post> GetPosts(IEnumerable<string> postIds)
         {
-            throw new NotImplementedException();
+            var postIdsList = postIds as IList<string> ?? postIds.ToList();
+            var postsResult = new List<FacebookPost>();
+            List<Post> result;
+
+            try
+            {
+                if (postIds == null || !postIdsList.Any())
+                {
+                    return new List<Post>();
+                }
+
+                string ids = string.Empty;
+                int count;
+
+                for (count = 1; count <= postIdsList.Count; count++)
+                {
+                    ids += postIdsList.ElementAt(count - 1) + ",";
+
+                    if (count % 10 == 0)
+                    {
+                        postsResult.AddRange(ExecutePostsRequest(ids.Substring(0, ids.Length - 1)));
+                        ids = "";
+                    }
+                }
+
+                if (count % 10 != 0 && count % 10 - 1 != 0)
+                {
+                    postsResult.AddRange(ExecutePostsRequest(ids.Substring(0, ids.Length - 1)));
+                }
+
+                result = ConvertFeed(new List<SerializedFeed>
+                {
+                    new SerializedFeed
+                    {
+                        Feed = new PostsCollection
+                        {
+                            Data = postsResult
+                        }
+                    }
+                });
+            }
+            catch (WebException e)
+            {
+                throw new SocialException("Cannot get posts.\n" + e.Message);
+            }
+
+            return result;
         }
 
         public string GetToken()
@@ -218,6 +265,23 @@ namespace uFeed.DAL.SocialService.Services.Facebook
             feedResult += "]";
 
             return _serializer.Deserialize<List<SerializedFeed>>(feedResult);
+        }
+
+        private List<FacebookPost> ExecutePostsRequest(string ids)
+        {
+            string request = $"?ids={ids}&fields=message,attachments,link," +
+                             "name,created_time,likes.limit(0).summary(true)";
+
+            string feedResult =
+                Request.ExecuteFacebookRequest(request, _token, "get");
+
+            //Converting this shit to JSON array of SerializedFeed
+            feedResult = Regex.Replace(feedResult, "^{\"\\d+_\\d+\":{", @"[{");
+            feedResult = Regex.Replace(feedResult, "\"\\d+_\\d+\":{", @"{");
+            feedResult = feedResult.Substring(0, feedResult.Length - 1);
+            feedResult += "]";
+
+            return _serializer.Deserialize<List<FacebookPost>>(feedResult);
         }
 
         private List<Post> ConvertFeed(List<SerializedFeed> serializedResult)
@@ -328,9 +392,9 @@ namespace uFeed.DAL.SocialService.Services.Facebook
                             new Author
                             {
                                 Id = feed.Id,
-                                Name = feed.Name,
-                                Photo = new Photo {Url = feed.Picture.Data.Url},
-                                Url = feed.Link
+                                Name = feed?.Name,
+                                Photo = new Photo {Url = feed?.Picture.Data.Url},
+                                Url = feed?.Link
                             },
                         CreatedTime = DateTime.Parse(post.Created_time),
                         Url = post.Link,
