@@ -286,12 +286,18 @@ namespace uFeed.DAL.SocialService.Services.Facebook
 
         private List<Post> ConvertFeed(List<SerializedFeed> serializedResult)
         {
+            var authors = new List<Author>();
             var result = new List<Post>();
             foreach (var feed in serializedResult)
             {
                 if (feed.Feed == null)
                 {
                     continue;
+                }
+
+                if (feed.Id == null)
+                {
+                    authors = GetAllAuthors();
                 }
 
                 foreach (var post in feed.Feed.Data)
@@ -386,16 +392,23 @@ namespace uFeed.DAL.SocialService.Services.Facebook
                             attachments.Add(attachment);
                         }
                     }
+
+                    var author = new Author
+                    {
+                        Id = feed?.Id,
+                        Name = feed?.Name,
+                        Photo = new Photo {Url = feed.Picture?.Data.Url},
+                        Url = feed?.Link
+                    };
+
+                    if (feed.Id == null)
+                    {
+                        author = authors.FirstOrDefault(a => a.Id.Equals(post.Id.Split('_')[0]));
+                    }
+
                     result.Add(new Post
                     {
-                        Author =
-                            new Author
-                            {
-                                Id = feed.Id,
-                                Name = feed?.Name,
-                                Photo = new Photo {Url = feed?.Picture.Data.Url},
-                                Url = feed?.Link
-                            },
+                        Author = author,
                         CreatedTime = DateTime.Parse(post.Created_time),
                         Url = post.Link,
                         Id = post.Id,
