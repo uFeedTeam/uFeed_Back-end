@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.IO;
 using System.Net;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using AutoMapper;
@@ -86,6 +87,8 @@ namespace uFeed.WEB.Controllers
                     return StatusCode(HttpStatusCode.BadRequest);
                 }
 
+                
+
                 var userAccount = _clientProfileService.Get(accountId);
                 userAccount.Name = user.Name;
 
@@ -108,11 +111,17 @@ namespace uFeed.WEB.Controllers
 
         [HttpPut]
         [Route("newphoto")]
-        public IHttpActionResult NewPhoto([FromBody] byte[] file)
+        public async Task<IHttpActionResult> NewPhoto()
         {
+            var file = await Request.Content.ReadAsByteArrayAsync();
             var accountId = User.Identity.GetUserId<int>();
 
             if (file == null)
+            {
+                return StatusCode(HttpStatusCode.BadRequest);
+            }
+
+            if (!IsValidImage(file))
             {
                 return StatusCode(HttpStatusCode.BadRequest);
             }
@@ -158,6 +167,20 @@ namespace uFeed.WEB.Controllers
             }
 
             return image;
+        }
+
+        private bool IsValidImage(byte[] bytes)
+        {
+            try
+            {
+                using (MemoryStream ms = new MemoryStream(bytes))
+                    Image.FromStream(ms);
+            }
+            catch (ArgumentException)
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

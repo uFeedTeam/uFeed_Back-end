@@ -32,8 +32,8 @@ namespace uFeed.WEB
             {
                 RequiredLength = 6,
                 RequireNonLetterOrDigit = false,
-                RequireDigit = true,
-                RequireLowercase = true,
+                RequireDigit = false,
+                RequireLowercase = false,
                 RequireUppercase = false
             };
 

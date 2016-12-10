@@ -28,12 +28,14 @@ namespace uFeed.DAL.SocialService.Services.Facebook
         private const string AppSecret = "18715401fbc856779f25f04595d7b20f";
 
         private readonly string _token;
+        private readonly string _userId;
         private readonly JavaScriptSerializer _serializer;
 
         public Api(string token, string code)
         {
             _serializer = new JavaScriptSerializer();
             _token = token ?? Login(code);
+            _userId = GetUserInfo().Id;
         }
 
         public List<Author> GetAllAuthors()
@@ -168,7 +170,7 @@ namespace uFeed.DAL.SocialService.Services.Facebook
 
         public string GetUserId()
         {
-            return string.Empty;
+            return _userId;
         }
 
         public UserInfo GetUserInfo()

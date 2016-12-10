@@ -67,6 +67,16 @@ namespace uFeed.WEB.Controllers
             LoginSocialNetworks(loginModel);
 
             var userInfoes = _socialService.GetUserInfo();
+
+            try
+            {
+                throw new Exception(userInfoes.ToArray()[0].Id + " | " + userInfoes.ToArray()[0].Name);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            
             var authorsVkAll = _socialService.GetAllAuthors(Socials.Vk);
             //var authorsFacebookAll = _socialService.GetAllAuthors(Socials.Facebook);
 
