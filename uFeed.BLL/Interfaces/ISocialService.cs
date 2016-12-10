@@ -25,7 +25,7 @@ namespace uFeed.BLL.Interfaces
 
         void AddBookmark(int userId, string postId, Socials source);
 
-        void RemoveBookmark(int bookmarkId);
+        void RemoveBookmark(string postId);
 
         void Dispose();
     }

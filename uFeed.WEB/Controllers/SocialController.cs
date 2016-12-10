@@ -208,12 +208,12 @@ namespace uFeed.WEB.Controllers
         }
 
         [HttpPost]
-        [Route("bookmarks/{id}/delete")]
-        public IHttpActionResult DeleteBookmarks(int id)
+        [Route("bookmarks/{postId}/delete")]
+        public IHttpActionResult DeleteBookmarks(string postId)
         {
             try
             {
-                _socialService.RemoveBookmark(id);
+                _socialService.RemoveBookmark(postId);
 
                 return Ok();
             }

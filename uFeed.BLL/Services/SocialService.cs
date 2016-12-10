@@ -253,16 +253,16 @@ namespace uFeed.BLL.Services
             _unitOfWork.Save();
         }
 
-        public void RemoveBookmark(int bookmarkId)
+        public void RemoveBookmark(string postId)
         {
-            var bookmark = _unitOfWork.ClientBookmarks.Get(bookmarkId);
+            var bookmark = _unitOfWork.ClientBookmarks.Find(x => x.PostId.Trim('-').Equals(postId)).FirstOrDefault();
 
             if (bookmark == null)
             {
-                throw new EntityNotFoundException($"Cannot find the bookmark. Id: {bookmarkId}", "Id");
+                throw new EntityNotFoundException($"Cannot find the bookmark. PostId: {postId}", "PostId");
             }
 
-            _unitOfWork.ClientBookmarks.Delete(bookmarkId);
+            _unitOfWork.ClientBookmarks.Delete(bookmark.Id);
             _unitOfWork.Save();
         }
 
