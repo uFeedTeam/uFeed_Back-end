@@ -7,7 +7,7 @@ namespace uFeed.DAL.EF
     {
         static UFeedContext()
         {
-            //Database.SetInitializer(new UFeedDbInitializer());
+            Database.SetInitializer(new UFeedDbInitializer());
         }
 
         public UFeedContext(string connectionString)
@@ -20,6 +20,8 @@ namespace uFeed.DAL.EF
         public virtual DbSet<Category> Categories { get; set; }
 
         public virtual DbSet<SocialAuthor> SocialAuthors { get; set; }
+
+        public virtual DbSet<ClientBookmark> ClientBookmarks { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

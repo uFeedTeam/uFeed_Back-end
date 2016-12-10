@@ -183,6 +183,71 @@ namespace uFeed.WEB.Controllers
             }
 }
 
+        [HttpPost]
+        [Route("bookmarks")]
+        public IHttpActionResult GetBookmarks(SocialLoginViewModel loginModel)
+        {
+            int userId = User.Identity.GetUserId<int>();
+
+            LoginSocialNetworks(loginModel);
+
+            try
+            {
+                var posts = _socialService.GetBookmarks(userId);
+
+                return Json(posts);
+            }
+            catch (EntityNotFoundException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.ToString());
+            }
+        }
+
+        [HttpPost]
+        [Route("bookmarks/{id}/delete")]
+        public IHttpActionResult DeleteBookmarks(int id)
+        {
+            try
+            {
+                _socialService.RemoveBookmark(id);
+
+                return Ok();
+            }
+            catch (EntityNotFoundException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.ToString());
+            }
+        }
+
+        [HttpPost]
+        [Route("bookmarks/add/{source}/{postId}")]
+        public IHttpActionResult CreateBookmarks(string postId, Socials source)
+        {
+            int userId = User.Identity.GetUserId<int>();
+
+            try
+            {
+                _socialService.AddBookmark(userId, postId, source);
+
+                return Ok();
+            }
+            catch (EntityNotFoundException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.ToString());
+            }
+        }
 
         private void LoginSocialNetworks(SocialLoginViewModel loginModel)
         {

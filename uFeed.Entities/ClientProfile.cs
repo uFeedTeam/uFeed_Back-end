@@ -14,9 +14,11 @@ namespace uFeed.Entities
         public string Name { get; set; }
 
         [Required]
-        public string Email { get; set; }        
+        public string Email { get; set; }
 
         public byte[] Photo { get; set; }
+
+        public virtual ICollection<ClientBookmark> Bookmarks { get; set; }
 
         public virtual ICollection<Login> Logins { get; set; }
 

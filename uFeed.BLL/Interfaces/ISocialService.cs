@@ -2,7 +2,6 @@
 using uFeed.BLL.DTO;
 using uFeed.BLL.DTO.Social;
 using uFeed.BLL.Enums;
-using uFeed.Entities;
 
 namespace uFeed.BLL.Interfaces
 {
@@ -21,6 +20,12 @@ namespace uFeed.BLL.Interfaces
         List<AuthorDTO> GetAuthors(int page, int count, Socials socialNetwork);
 
         List<PostDTO> GetFeed(CategoryDTO category, int page, int countPosts, Socials[] logins);
+
+        List<PostDTO> GetBookmarks(int userId);
+
+        void AddBookmark(int userId, string postId, Socials source);
+
+        void RemoveBookmark(int bookmarkId);
 
         void Dispose();
     }

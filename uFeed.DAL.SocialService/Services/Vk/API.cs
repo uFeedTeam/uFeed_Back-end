@@ -143,6 +143,11 @@ namespace uFeed.DAL.SocialService.Services.Vk
             return ConvertToGeneralPostList(vkFeed);           
         }
 
+        public List<Post> GetPosts(IEnumerable<string> postIds)
+        {
+            throw new NotImplementedException();
+        }
+
         private static List<Author> ConvertToGeneralAuthorList(IReadOnlyList<VkGroup> vkGroupList)
         {
             var authorList = new List<Author>();

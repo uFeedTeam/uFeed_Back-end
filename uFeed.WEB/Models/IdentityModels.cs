@@ -62,7 +62,7 @@ namespace uFeed.WEB.Models
 
         public static ApplicationDbContext Create()
         {
-            //Database.SetInitializer(new AuthDbInitializer());
+            Database.SetInitializer(new AuthDbInitializer());
             return new ApplicationDbContext();
         }
     }
@@ -77,9 +77,9 @@ namespace uFeed.WEB.Models
             {
                 Id = 1,
                 Email = "qwe@qwe",
-                UserName = "qwe"
+                UserName = "qwe@qwe"
             };
-            string password = "Admin_1234";
+            string password = "qwe123";
 
             userManager.Create(admin, password);
 

@@ -15,6 +15,7 @@ namespace uFeed.DAL.UnitOfWorks
         private IRepository<Category> _categoryRepository;
         private IRepository<Login> _loginRepository;
         private IRepository<SocialAuthor> _socialAuthorRepository;
+        private IRepository<ClientBookmark> _clientBookmarkRepository;
 
         public UFeedUnitOfWork(string connectionString)
         {
@@ -28,6 +29,7 @@ namespace uFeed.DAL.UnitOfWorks
         public IRepository<Login> Logins => _loginRepository ?? (_loginRepository = new CommonRepository<Login>(_db));
 
         public IRepository<SocialAuthor> SocialAuthors => _socialAuthorRepository ?? (_socialAuthorRepository = new CommonRepository<SocialAuthor>(_db));
+        public IRepository<ClientBookmark> ClientBookmarks => _clientBookmarkRepository ?? (_clientBookmarkRepository = new CommonRepository<ClientBookmark>(_db));
 
         public void Save()
         {

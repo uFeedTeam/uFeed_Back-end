@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DTO\CategoryDTO.cs" />
+    <Compile Include="DTO\ClientBookmarkDTO.cs" />
     <Compile Include="DTO\ClientProfileDTO.cs" />
     <Compile Include="DTO\SocialAuthorDTO.cs" />
     <Compile Include="DTO\Social\Attach\AlbumDTO.cs" />

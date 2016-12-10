@@ -17,5 +17,7 @@ namespace uFeed.DAL.SocialService.Interfaces
         List<Author> GetAuthors(int page, int count);
 
         List<Post> GetFeed(Category category, int page, int count);
+
+        List<Post> GetPosts(IEnumerable<string> postIds);
     }
 }

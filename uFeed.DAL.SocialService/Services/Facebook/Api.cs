@@ -163,6 +163,11 @@ namespace uFeed.DAL.SocialService.Services.Facebook
             return result;
         }
 
+        public List<Post> GetPosts(IEnumerable<string> postIds)
+        {
+            throw new NotImplementedException();
+        }
+
         public string GetToken()
         {
             return _token;

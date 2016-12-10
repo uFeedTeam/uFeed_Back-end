@@ -14,6 +14,8 @@ namespace uFeed.DAL.Interfaces
 
         IRepository<SocialAuthor> SocialAuthors { get; }
 
+        IRepository<ClientBookmark> ClientBookmarks { get; }
+
         void Save();
     }
 }

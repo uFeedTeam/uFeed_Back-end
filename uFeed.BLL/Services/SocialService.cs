@@ -4,6 +4,7 @@ using AutoMapper;
 using uFeed.BLL.DTO;
 using uFeed.BLL.DTO.Social;
 using uFeed.BLL.Enums;
+using uFeed.BLL.Infrastructure.Exceptions;
 using uFeed.BLL.Interfaces;
 using uFeed.DAL.Interfaces;
 using uFeed.DAL.SocialService.Interfaces;
@@ -178,6 +179,81 @@ namespace uFeed.BLL.Services
             }
 
             return Mapper.Map<IEnumerable<PostDTO>>(feed).ToList();
+        }
+
+        public List<PostDTO> GetBookmarks(int userId)
+        {
+            var user = _unitOfWork.ClientProfiles.GetByUserId(userId);
+
+            if (user == null)
+            {
+                throw new EntityNotFoundException("User cannot be found", "User");
+            }
+
+            var posts = new List<Post>();
+
+            if (user.Logins == null || user.Logins.Count <= 0)
+            {
+                return Mapper.Map<IEnumerable<PostDTO>>(posts).ToList();
+            }
+
+            if (user.Logins.Select(login => login.LoginType).ToList()
+                .Contains(Entities.Enums.Socials.Facebook))
+            {
+                var fbBookmarkIds =
+                    user.Bookmarks
+                        .Where(bookmark => bookmark.Source == Entities.Enums.Socials.Facebook)
+                        .Select(bookmark => bookmark.PostId);
+
+                posts.AddRange(_socialUnitOfWork.FacebookApi.GetPosts(fbBookmarkIds));
+            }
+            if (user.Logins.Select(login => login.LoginType).ToList()
+                .Contains(Entities.Enums.Socials.Vk))
+            {
+                var vkBookmarkIds =
+                    user.Bookmarks
+                        .Where(bookmark => bookmark.Source == Entities.Enums.Socials.Vk)
+                        .Select(bookmark => bookmark.PostId);
+
+                posts.AddRange(_socialUnitOfWork.VkApi.GetPosts(vkBookmarkIds));
+            }
+
+            var resultPosts = Mapper.Map<IEnumerable<PostDTO>>(posts);
+
+            return resultPosts.ToList();
+        }
+
+        public void AddBookmark(int userId, string postId, Socials source)
+        {
+            var user = _unitOfWork.ClientProfiles.GetByUserId(userId);
+
+            if (user == null)
+            {
+                throw new EntityNotFoundException("User cannot be found", "User");
+            }
+
+            var bookmark = new ClientBookmark
+            {
+                ClientProfile = user,
+                PostId = postId,
+                Source = (Entities.Enums.Socials)source
+            };
+
+            _unitOfWork.ClientBookmarks.Create(bookmark);
+            _unitOfWork.Save();
+        }
+
+        public void RemoveBookmark(int bookmarkId)
+        {
+            var bookmark = _unitOfWork.ClientBookmarks.Get(bookmarkId);
+
+            if (bookmark == null)
+            {
+                throw new EntityNotFoundException($"Cannot find the bookmark. Id: {bookmarkId}", "Id");
+            }
+
+            _unitOfWork.ClientBookmarks.Delete(bookmarkId);
+            _unitOfWork.Save();
         }
 
         public void Dispose()

@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="BaseType.cs" />
     <Compile Include="Category.cs" />
+    <Compile Include="ClientBookmark.cs" />
     <Compile Include="ClientProfile.cs" />
     <Compile Include="Enums\Socials.cs" />
     <Compile Include="Login.cs" />
