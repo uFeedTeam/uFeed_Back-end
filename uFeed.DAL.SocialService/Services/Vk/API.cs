@@ -145,7 +145,17 @@ namespace uFeed.DAL.SocialService.Services.Vk
 
         public List<Post> GetPosts(IEnumerable<string> postIds)
         {
-            return new List<Post>();
+            string requestString =
+               $@"https://api.vk.com/method/wall.getById?owner_id={UserId}&access_token={AccessToken}&posts=";
+
+            requestString = postIds.Aggregate(requestString, (current, postId) => current + postId + ",");
+            var token = MakeRequest(requestString);
+            IEnumerable<JToken> tokenArr = token["response"].Children();
+            var vkFeed = new List<VkWallPost>();
+            FillFeedFromJTooken(vkFeed, tokenArr);
+
+            List<Post> generalFeed = ConvertToGeneralPostList(vkFeed);
+            return generalFeed;
         }
 
         private static List<Author> ConvertToGeneralAuthorList(IReadOnlyList<VkGroup> vkGroupList)
@@ -190,8 +200,6 @@ namespace uFeed.DAL.SocialService.Services.Vk
                             $"https://api.vk.com/method/likes.add?access_token={AccessToken}&type=post&owner_id={UserId}&item_id={vkPost.Id}"
                     }
                 };
-
-                
 
                 try
                 {
