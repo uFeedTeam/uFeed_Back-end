@@ -17,15 +17,13 @@ namespace uFeed.WEB.Controllers
 {
     [Authorize]
     [RoutePrefix("api/social")]
-    public class SocialController : ApiController
+    public class SocialController : SocialBaseController
     {
-        private readonly ISocialService _socialService;
         private readonly ICategoryService _categoryService;
         private readonly IClientProfileService _clientProfileService;
 
-        public SocialController(ISocialService socialService, ICategoryService categoryService, IClientProfileService clientProfileService)
+        public SocialController(ICategoryService categoryService, IClientProfileService clientProfileService)
         {
-            _socialService = socialService;
             _categoryService = categoryService;
             _clientProfileService = clientProfileService;
         }
@@ -35,12 +33,12 @@ namespace uFeed.WEB.Controllers
         [AllowAnonymous]
         public IHttpActionResult AuthenticationVk(string code)
         {
-            _socialService.Login(Socials.Vk, code);
+            SocialService.Login(Socials.Vk, code);
 
             var vkLogin = new VkLoginViewModel
             {
-                AccessToken = _socialService.GetToken(Socials.Vk),
-                UserId = _socialService.GetUserId(Socials.Vk)
+                AccessToken = SocialService.GetToken(Socials.Vk),
+                UserId = SocialService.GetUserId(Socials.Vk)
             };
 
             return Ok(vkLogin);
@@ -51,11 +49,11 @@ namespace uFeed.WEB.Controllers
         [AllowAnonymous]
         public IHttpActionResult AuthenticationFb(string code)
         {
-            _socialService.Login(Socials.Facebook, code + "#");
+            SocialService.Login(Socials.Facebook, code + "#");
 
             var facebookLogin = new FacebookLoginViewModel
             {
-                AccessToken = _socialService.GetToken(Socials.Facebook)
+                AccessToken = SocialService.GetToken(Socials.Facebook)
             };
 
             return Ok(facebookLogin);
@@ -64,9 +62,8 @@ namespace uFeed.WEB.Controllers
         [HttpPost]
         public IHttpActionResult Test(SocialLoginViewModel loginModel)
         {
-            LoginSocialNetworks(loginModel);
 
-            var userInfoes = _socialService.GetUserInfo();
+            var userInfoes = SocialService.GetUserInfo();
 
             try
             {
@@ -77,13 +74,13 @@ namespace uFeed.WEB.Controllers
                 return BadRequest(ex.Message);
             }
             
-            var authorsVkAll = _socialService.GetAllAuthors(Socials.Vk);
+            var authorsVkAll = SocialService.GetAllAuthors(Socials.Vk);
             //var authorsFacebookAll = _socialService.GetAllAuthors(Socials.Facebook);
 
-            var authorsVk = _socialService.GetAuthors(1, 10, Socials.Vk);
+            var authorsVk = SocialService.GetAuthors(1, 10, Socials.Vk);
             //var authorsFacebook = _socialService.GetAuthors(1, 10, Socials.Facebook);
 
-            authorsVk = _socialService.GetAuthors(2, 10, Socials.Vk);
+            authorsVk = SocialService.GetAuthors(2, 10, Socials.Vk);
             //authorsFacebook = _socialService.GetAuthors(2, 10, Socials.Facebook);
 
             //authorsVk.AddRange(authorsFacebook);
@@ -95,9 +92,9 @@ namespace uFeed.WEB.Controllers
                 Source = authorDTO.Source
             }).ToList();
 
-            var feed1 = _socialService.GetFeed(new CategoryDTO { Id = 1, Authors = socialAuthors }, 1, 2, new []{Socials.Facebook, Socials.Vk });
+            var feed1 = SocialService.GetFeed(new CategoryDTO { Id = 1, Authors = socialAuthors }, 1, 2, new []{Socials.Facebook, Socials.Vk });
 
-            var feed2 = _socialService.GetFeed(new CategoryDTO { Id = 1, Authors = socialAuthors }, 2, 2, new[] { Socials.Facebook, Socials.Vk });
+            var feed2 = SocialService.GetFeed(new CategoryDTO { Id = 1, Authors = socialAuthors }, 2, 2, new[] { Socials.Facebook, Socials.Vk });
 
             return Ok();
         }
@@ -106,7 +103,6 @@ namespace uFeed.WEB.Controllers
         [Route("authors")]
         public IHttpActionResult GetAllAuthors(SocialLoginViewModel loginModel)
         {
-            LoginSocialNetworks(loginModel);
 
             var model = new GetAuthorsViewModel();
 
@@ -114,13 +110,13 @@ namespace uFeed.WEB.Controllers
 
             if (clientProfile.Logins.Contains(Socials.Facebook))
             {
-                var fbAuthorsDto = _socialService.GetAllAuthors(Socials.Facebook);
+                var fbAuthorsDto = SocialService.GetAllAuthors(Socials.Facebook);
                 model.FacebookAuthors = Mapper.Map<IEnumerable<AuthorViewModel>>(fbAuthorsDto);
             }
 
             if (clientProfile.Logins.Contains(Socials.Vk))
             {
-                var vkAuthorsDto = _socialService.GetAllAuthors(Socials.Vk);
+                var vkAuthorsDto = SocialService.GetAllAuthors(Socials.Vk);
                 model.VkAuthors = Mapper.Map<IEnumerable<AuthorViewModel>>(vkAuthorsDto);
             }
 
@@ -133,7 +129,6 @@ namespace uFeed.WEB.Controllers
         {
             try
             {
-                LoginSocialNetworks(loginModel);
 
                 var model = new GetAuthorsViewModel();
 
@@ -141,13 +136,13 @@ namespace uFeed.WEB.Controllers
 
                 if (clientProfile.Logins.Contains(Socials.Facebook))
                 {
-                    List<AuthorDTO> fbAuthorsDto = _socialService.GetAuthors(page, count, Socials.Facebook);
+                    List<AuthorDTO> fbAuthorsDto = SocialService.GetAuthors(page, count, Socials.Facebook);
                     model.FacebookAuthors = Mapper.Map<IEnumerable<AuthorViewModel>>(fbAuthorsDto);
                 }
 
                 if (clientProfile.Logins.Contains(Socials.Vk))
                 {
-                    List<AuthorDTO> vkAuthorsDto = _socialService.GetAuthors(page, count, Socials.Vk);
+                    List<AuthorDTO> vkAuthorsDto = SocialService.GetAuthors(page, count, Socials.Vk);
                     model.VkAuthors = Mapper.Map<IEnumerable<AuthorViewModel>>(vkAuthorsDto);
                 }
 
@@ -163,13 +158,12 @@ namespace uFeed.WEB.Controllers
         [Route("feed/{categoryId}/{page}/{postsPerGroup}")]
         public IHttpActionResult GetFeed(SocialLoginViewModel loginModel, int categoryId, int page, int postsPerGroup)
         {
-            LoginSocialNetworks(loginModel);
 
             try
             {
                 var client = _clientProfileService.Get(User.Identity.GetUserId<int>());
                 var categoryDto = _categoryService.Get(categoryId);
-                var feed = _socialService.GetFeed(categoryDto, page, postsPerGroup, client.Logins.ToArray());
+                var feed = SocialService.GetFeed(categoryDto, page, postsPerGroup, client.Logins.ToArray());
 
                 return Json(feed);
             }
@@ -189,11 +183,9 @@ namespace uFeed.WEB.Controllers
         {
             int userId = User.Identity.GetUserId<int>();
 
-            LoginSocialNetworks(loginModel);
-
             try
             {
-                var posts = _socialService.GetBookmarks(userId);
+                var posts = SocialService.GetBookmarks(userId);
 
                 return Json(posts);
             }
@@ -213,7 +205,7 @@ namespace uFeed.WEB.Controllers
         {
             try
             {
-                _socialService.RemoveBookmark(postId);
+                SocialService.RemoveBookmark(postId);
 
                 return Ok();
             }
@@ -235,7 +227,7 @@ namespace uFeed.WEB.Controllers
 
             try
             {
-                _socialService.AddBookmark(userId, postId, source);
+                SocialService.AddBookmark(userId, postId, source);
 
                 return Ok();
             }
@@ -246,19 +238,6 @@ namespace uFeed.WEB.Controllers
             catch (Exception ex)
             {
                 return BadRequest(ex.ToString());
-            }
-        }
-
-        private void LoginSocialNetworks(SocialLoginViewModel loginModel)
-        {
-            if (loginModel.FacebookLogin != null)
-            {
-                _socialService.Login(Socials.Facebook, loginModel.FacebookLogin.AccessToken, isAccessToken: true);
-            }
-
-            if (loginModel.VkLogin != null)
-            {
-                _socialService.Login(Socials.Vk, loginModel.VkLogin.AccessToken, loginModel.VkLogin.UserId, true);
             }
         }
     }
