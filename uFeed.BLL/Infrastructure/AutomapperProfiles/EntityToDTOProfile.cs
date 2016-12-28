@@ -14,13 +14,13 @@ namespace uFeed.BLL.Infrastructure.AutomapperProfiles
     {
         public EntityToDTOProfile()
         {
-            CreateMap<ClientProfile, ClientProfileDTO>().BeforeMap((source, dto) =>
+            CreateMap<User, UserDTO>().BeforeMap((source, dto) =>
             {
                 dto.Logins = source.Logins.Select(l => (Socials)l.LoginType).ToList();
             }).ForMember(dto => dto.Logins, expression => expression.Ignore());
             CreateMap<Category, CategoryDTO>().BeforeMap((source, dto) =>
             {
-                dto.UserId = source.User.UserId;
+                dto.UserId = source.User.Id;
             });
             CreateMap<SocialAuthor, SocialAuthorDTO>();
 

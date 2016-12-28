@@ -1,12 +1,11 @@
 ﻿using System;
-using uFeed.DAL.Repositories;
 using uFeed.Entities;
 
 namespace uFeed.DAL.Interfaces
 {
     public interface IUnitOfWork : IDisposable
     {
-        ClientProfileRepository ClientProfiles { get; }
+        IRepository<User> Users { get; }
 
         IRepository<Category> Categories { get; }
 

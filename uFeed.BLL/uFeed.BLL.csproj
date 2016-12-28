@@ -50,7 +50,7 @@
   <ItemGroup>
     <Compile Include="DTO\CategoryDTO.cs" />
     <Compile Include="DTO\ClientBookmarkDTO.cs" />
-    <Compile Include="DTO\ClientProfileDTO.cs" />
+    <Compile Include="DTO\UserDTO.cs" />
     <Compile Include="DTO\SocialAuthorDTO.cs" />
     <Compile Include="DTO\Social\Attach\AlbumDTO.cs" />
     <Compile Include="DTO\Social\Attach\AttachmentDTO.cs" />
@@ -67,17 +67,18 @@
     <Compile Include="Enums\Socials.cs" />
     <Compile Include="Infrastructure\AutomapperProfiles\DTOToEntityProfile.cs" />
     <Compile Include="Infrastructure\AutomapperProfiles\EntityToDTOProfile.cs" />
+    <Compile Include="Infrastructure\CryptoProvider.cs" />
     <Compile Include="Infrastructure\Exceptions\EntityNotFoundException.cs" />
     <Compile Include="Infrastructure\Exceptions\ServiceException.cs" />
     <Compile Include="Infrastructure\Exceptions\ValidationException.cs" />
     <Compile Include="Infrastructure\ServiceModule.cs" />
     <Compile Include="Interfaces\ICategoryService.cs" />
     <Compile Include="Interfaces\ISocialService.cs" />
-    <Compile Include="Interfaces\IClientProfileService.cs" />
+    <Compile Include="Interfaces\IUserService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\CategoryService.cs" />
     <Compile Include="Services\SocialService.cs" />
-    <Compile Include="Services\ClientProfileService.cs" />
+    <Compile Include="Services\UserService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

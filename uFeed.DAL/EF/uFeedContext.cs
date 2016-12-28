@@ -15,7 +15,7 @@ namespace uFeed.DAL.EF
         {
         }
   
-        public virtual DbSet<ClientProfile> ClientProfiles { get; set; }
+        public virtual DbSet<User> ClientProfiles { get; set; }
 
         public virtual DbSet<Category> Categories { get; set; }
 
@@ -25,7 +25,7 @@ namespace uFeed.DAL.EF
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<ClientProfile>()
+            modelBuilder.Entity<User>()
             .HasMany(a => a.Categories)
             .WithRequired(a => a.User)
             .WillCascadeOnDelete(true);

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 using AutoMapper;
-using Microsoft.AspNet.Identity;
 using uFeed.BLL.DTO;
 using uFeed.BLL.DTO.Social;
 using uFeed.BLL.Enums;
@@ -20,12 +19,12 @@ namespace uFeed.WEB.Controllers
     public class SocialController : SocialBaseController
     {
         private readonly ICategoryService _categoryService;
-        private readonly IClientProfileService _clientProfileService;
+        private readonly IUserService _userService;
 
-        public SocialController(ICategoryService categoryService, IClientProfileService clientProfileService)
+        public SocialController(ICategoryService categoryService, IClientProfileService clientProfileService, IUserService userService)
         {
             _categoryService = categoryService;
-            _clientProfileService = clientProfileService;
+            _userService = userService;
         }
 
         [HttpGet]
@@ -106,7 +105,7 @@ namespace uFeed.WEB.Controllers
 
             var model = new GetAuthorsViewModel();
 
-            var clientProfile = _clientProfileService.Get(User.Identity.GetUserId<int>());
+            var clientProfile = _userService.Get(CurrentUser.Id);
 
             if (clientProfile.Logins.Contains(Socials.Facebook))
             {
@@ -132,7 +131,7 @@ namespace uFeed.WEB.Controllers
 
                 var model = new GetAuthorsViewModel();
 
-                var clientProfile = _clientProfileService.Get(User.Identity.GetUserId<int>());
+                var clientProfile = _userService.Get(CurrentUser.Id);
 
                 if (clientProfile.Logins.Contains(Socials.Facebook))
                 {
@@ -161,7 +160,7 @@ namespace uFeed.WEB.Controllers
 
             try
             {
-                var client = _clientProfileService.Get(User.Identity.GetUserId<int>());
+                var client = _userService.Get(CurrentUser.Id);
                 var categoryDto = _categoryService.Get(categoryId);
                 var feed = SocialService.GetFeed(categoryDto, page, postsPerGroup, client.Logins.ToArray());
 
@@ -181,7 +180,7 @@ namespace uFeed.WEB.Controllers
         [Route("bookmarks")]
         public IHttpActionResult GetBookmarks(SocialLoginViewModel loginModel)
         {
-            int userId = User.Identity.GetUserId<int>();
+            int userId = CurrentUser.Id;
 
             try
             {
@@ -223,7 +222,7 @@ namespace uFeed.WEB.Controllers
         [Route("bookmarks/add/{source}/{postId}")]
         public IHttpActionResult CreateBookmarks(string postId, Socials source)
         {
-            int userId = User.Identity.GetUserId<int>();
+            int userId = CurrentUser.Id;
 
             try
             {

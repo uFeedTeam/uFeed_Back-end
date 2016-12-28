@@ -12,7 +12,7 @@ namespace uFeed.Entities
         public int ClientProfileId { get; set; }
 
         [ForeignKey(nameof(ClientProfileId))]
-        public virtual ClientProfile User { get; set; }
+        public virtual User User { get; set; }
 
         public virtual ICollection<SocialAuthor> Authors { get; set; }
     }

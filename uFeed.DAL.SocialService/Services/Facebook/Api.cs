@@ -18,6 +18,7 @@ using Attachment = uFeed.Entities.Social.Attach.Attachment;
 using Likes = uFeed.Entities.Social.Attach.Likes;
 using Post = uFeed.Entities.Social.Post;
 using FacebookPost = uFeed.DAL.SocialService.Models.FacebookModel.Feed.Post;
+using User = uFeed.DAL.SocialService.Models.FacebookModel.User.User;
 
 namespace uFeed.DAL.SocialService.Services.Facebook
 {

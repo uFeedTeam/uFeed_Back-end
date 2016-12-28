@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using AutoMapper;
-using Microsoft.AspNet.Identity;
 using uFeed.BLL.Enums;
 using uFeed.BLL.Infrastructure.Exceptions;
 using uFeed.BLL.Interfaces;
@@ -16,13 +15,13 @@ namespace uFeed.WEB.Controllers
 {
     [Authorize]
     [RoutePrefix("api/user")]
-    public class UserController : ApiController
+    public class UserController : BaseController
     {
-        private readonly IClientProfileService _clientProfileService;
+        private readonly IUserService _userService;
 
-        public UserController(IClientProfileService clientProfileService)
+        public UserController(IUserService userService)
         {
-            _clientProfileService = clientProfileService;
+            _userService = userService;
         }
 
         [HttpPost]
@@ -32,10 +31,10 @@ namespace uFeed.WEB.Controllers
             switch (socialNetwork)
             {
                 case Socials.Facebook:
-                    _clientProfileService.AddLogin(User.Identity.GetUserId<int>(), socialNetwork);
+                    _userService.AddLogin(CurrentUser.Id, socialNetwork);
                     break;
                 case Socials.Vk:
-                    _clientProfileService.AddLogin(User.Identity.GetUserId<int>(), socialNetwork);
+                    _userService.AddLogin(CurrentUser.Id, socialNetwork);
                     break;
                 default:
                     return StatusCode(HttpStatusCode.BadRequest);
@@ -48,9 +47,9 @@ namespace uFeed.WEB.Controllers
         [Route("get")]
         public IHttpActionResult Get()
         {
-            var userDto = _clientProfileService.Get(User.Identity.GetUserId<int>());
+            var userDto = _userService.Get(CurrentUser.Id);
 
-            var userViewModel = Mapper.Map<ClientProfileViewModel>(userDto);
+            var userViewModel = Mapper.Map<UserViewModel>(userDto);
 
             return Ok(userViewModel);
         }
@@ -62,10 +61,10 @@ namespace uFeed.WEB.Controllers
             switch (socialNetwork)
             {
                 case Socials.Facebook:
-                    _clientProfileService.RemoveLogin(User.Identity.GetUserId<int>(), socialNetwork);
+                    _userService.RemoveLogin(CurrentUser.Id, socialNetwork);
                     break;
                 case Socials.Vk:
-                    _clientProfileService.RemoveLogin(User.Identity.GetUserId<int>(), socialNetwork);
+                    _userService.RemoveLogin(CurrentUser.Id, socialNetwork);
                     break;
                 default:
                     return StatusCode(HttpStatusCode.BadRequest);
@@ -76,11 +75,11 @@ namespace uFeed.WEB.Controllers
 
         [HttpPut]
         [Route("newname")]
-        public IHttpActionResult EditName([FromBody] ClientProfileViewModel user)
+        public IHttpActionResult EditName([FromBody] UserViewModel user)
         {
             try
             {
-                var accountId = User.Identity.GetUserId<int>();
+                var accountId = CurrentUser.Id;
 
                 if (string.IsNullOrEmpty(user?.Name))
                 {
@@ -89,12 +88,12 @@ namespace uFeed.WEB.Controllers
 
                 
 
-                var userAccount = _clientProfileService.Get(accountId);
+                var userAccount = _userService.Get(accountId);
                 userAccount.Name = user.Name;
 
                 try
                 {
-                    _clientProfileService.Update(userAccount);
+                    _userService.Update(userAccount);
                 }
                 catch (ServiceException)
                 {
@@ -114,7 +113,7 @@ namespace uFeed.WEB.Controllers
         public async Task<IHttpActionResult> NewPhoto()
         {
             var file = await Request.Content.ReadAsByteArrayAsync();
-            var accountId = User.Identity.GetUserId<int>();
+            var accountId = CurrentUser.Id;
 
             if (file == null)
             {
@@ -126,12 +125,12 @@ namespace uFeed.WEB.Controllers
                 return StatusCode(HttpStatusCode.BadRequest);
             }
 
-            var userAccount = _clientProfileService.Get(accountId);
+            var userAccount = _userService.Get(accountId);
 
             userAccount.Photo = file;
             try
             {
-                _clientProfileService.Update(userAccount);
+                _userService.Update(userAccount);
             }
             catch (ServiceException)
             {

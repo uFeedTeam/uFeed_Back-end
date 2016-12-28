@@ -183,7 +183,7 @@ namespace uFeed.BLL.Services
 
         public List<PostDTO> GetBookmarks(int userId)
         {
-            var user = _unitOfWork.ClientProfiles.GetByUserId(userId);
+            var user = _unitOfWork.Users.Get(userId);
 
             if (user == null)
             {
@@ -228,7 +228,7 @@ namespace uFeed.BLL.Services
 
         public void AddBookmark(int userId, string postId, Socials source)
         {
-            var user = _unitOfWork.ClientProfiles.GetByUserId(userId);
+            var user = _unitOfWork.Users.Get(userId);
 
             if (user == null)
             {
