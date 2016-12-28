@@ -52,7 +52,7 @@
     <Compile Include="BaseType.cs" />
     <Compile Include="Category.cs" />
     <Compile Include="ClientBookmark.cs" />
-    <Compile Include="ClientProfile.cs" />
+    <Compile Include="User.cs" />
     <Compile Include="Enums\Socials.cs" />
     <Compile Include="Login.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

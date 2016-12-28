@@ -11,7 +11,7 @@ namespace uFeed.DAL.UnitOfWorks
         private readonly UFeedContext _db;
         private bool _disposed;
 
-        private ClientProfileRepository _clientProfileRepository;
+        private IRepository<User> _userRepository;
         private IRepository<Category> _categoryRepository;
         private IRepository<Login> _loginRepository;
         private IRepository<SocialAuthor> _socialAuthorRepository;
@@ -22,7 +22,7 @@ namespace uFeed.DAL.UnitOfWorks
             _db = new UFeedContext(connectionString);
         }
 
-        public ClientProfileRepository ClientProfiles => _clientProfileRepository ?? (_clientProfileRepository = new ClientProfileRepository(_db));
+        public IRepository<User> Users => _userRepository ?? (_userRepository = new CommonRepository<User>(_db));
 
         public IRepository<Category> Categories => _categoryRepository ?? (_categoryRepository = new CommonRepository<Category>(_db));
 
@@ -36,7 +36,7 @@ namespace uFeed.DAL.UnitOfWorks
             _db.SaveChanges();
         }
 
-        public virtual void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (!_disposed)
             {

@@ -22,11 +22,11 @@ namespace uFeed.BLL.Services
         {
             var category = Mapper.Map<Category>(categoryDto);
 
-            var clientProfile = _unitOfWork.ClientProfiles.GetByUserId(categoryDto.UserId);
+            var clientProfile = _unitOfWork.Users.Get(categoryDto.UserId);
 
             if (clientProfile == null)
             {
-                throw new EntityNotFoundException($"User with id = {categoryDto.UserId} wasn't found", "ClientProfile");
+                throw new EntityNotFoundException($"User with id = {categoryDto.UserId} wasn't found", "User");
             }
 
             category.ClientProfileId = clientProfile.Id;
@@ -82,7 +82,7 @@ namespace uFeed.BLL.Services
 
         public IEnumerable<CategoryDTO> GetByUserId(int userId)
         {
-            var categories = _unitOfWork.Categories.Find(x => x.User.UserId == userId);
+            var categories = _unitOfWork.Categories.Find(x => x.User.Id == userId);
             var categoriesDto = Mapper.Map<IEnumerable<CategoryDTO>>(categories);
 
             return categoriesDto;

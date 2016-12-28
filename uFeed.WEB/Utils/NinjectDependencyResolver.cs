@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Principal;
 using System.Web.Mvc;
 using Ninject;
+using Ninject.Web.Common;
 using uFeed.BLL.Interfaces;
 using uFeed.BLL.Services;
+using uFeed.WEB.Account.Implementation;
+using uFeed.WEB.Account.Interfaces;
 
 namespace uFeed.WEB.Utils
 {
@@ -29,9 +33,12 @@ namespace uFeed.WEB.Utils
 
         private void AddBindings()
         {
-            _kernel.Bind<IClientProfileService>().To<ClientProfileService>();
+            _kernel.Bind<IUserService>().To<UserService>();
             _kernel.Bind<ISocialService>().To<SocialService>();
             _kernel.Bind<ICategoryService>().To<CategoryService>();
+            _kernel.Bind<IAuthentication>().To<Authentication>().InRequestScope();
+            _kernel.Bind<IIdentity>().To<UserIdentity>();
+            _kernel.Bind<IPrincipal>().To<UserProvider>();
         }
     }
 }

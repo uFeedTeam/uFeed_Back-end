@@ -4,7 +4,7 @@ namespace uFeed.Entities
 {
     public class ClientBookmark : BaseType
     {
-        public virtual ClientProfile ClientProfile { get; set; }
+        public virtual User ClientProfile { get; set; }
 
         public string PostId { get; set; }
 

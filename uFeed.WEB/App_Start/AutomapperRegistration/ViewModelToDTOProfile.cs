@@ -12,7 +12,7 @@ namespace uFeed.WEB.AutomapperRegistration
     {
         public ViewModelToDTOProfile()
         {
-            CreateMap<ClientProfileViewModel, ClientProfileDTO>();
+            CreateMap<UserViewModel, UserDTO>();
             CreateMap<CategoryViewModel, CategoryDTO>();
             CreateMap<SocialAuthorViewModel, SocialAuthorDTO>();
 

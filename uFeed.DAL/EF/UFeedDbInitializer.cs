@@ -7,12 +7,12 @@ namespace uFeed.DAL.EF
     {
         protected override void Seed(UFeedContext db)
         {
-            var clientProfile = new ClientProfile
+            var clientProfile = new User
             {
                 Id = 1,
-                UserId = 1,
                 Email = "qwe@qwe",
-                Name = "qwe"
+                Name = "qwe",
+                PasswordHash = "11111"
             };
 
             db.ClientProfiles.Add(clientProfile);

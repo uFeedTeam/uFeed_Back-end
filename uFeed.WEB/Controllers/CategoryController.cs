@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Web.Http;
 using AutoMapper;
-using Microsoft.AspNet.Identity;
 using uFeed.BLL.DTO;
 using uFeed.BLL.Infrastructure.Exceptions;
 using uFeed.BLL.Interfaces;
@@ -11,7 +10,7 @@ namespace uFeed.WEB.Controllers
 {
     [Authorize]
     [RoutePrefix("api")]
-    public class CategoryController: ApiController
+    public class CategoryController: BaseController
     {
         private readonly ICategoryService _categoryService;
 
@@ -68,7 +67,7 @@ namespace uFeed.WEB.Controllers
         [Route("categories")]
         public IHttpActionResult GetByUserId()
         {
-            IEnumerable<CategoryDTO> categoriesDto = _categoryService.GetByUserId(User.Identity.GetUserId<int>());
+            IEnumerable<CategoryDTO> categoriesDto = _categoryService.GetByUserId(CurrentUser.Id);
             var categoriesViewModel = Mapper.Map<IEnumerable<CategoryViewModel>>(categoriesDto);
 
             return Json(categoriesViewModel);
