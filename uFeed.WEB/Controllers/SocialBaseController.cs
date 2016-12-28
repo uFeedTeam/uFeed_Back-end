@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Web.Http;
 using System.Web.Mvc;
 using uFeed.BLL.Enums;
 using uFeed.BLL.Interfaces;
 
 namespace uFeed.WEB.Controllers
 {
-    public class SocialBaseController : ApiController
+    public class SocialBaseController : BaseController
     {
         protected ISocialService SocialService
         {

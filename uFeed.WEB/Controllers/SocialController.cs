@@ -21,7 +21,7 @@ namespace uFeed.WEB.Controllers
         private readonly ICategoryService _categoryService;
         private readonly IUserService _userService;
 
-        public SocialController(ICategoryService categoryService, IClientProfileService clientProfileService, IUserService userService)
+        public SocialController(ICategoryService categoryService, IUserService userService)
         {
             _categoryService = categoryService;
             _userService = userService;
@@ -58,20 +58,11 @@ namespace uFeed.WEB.Controllers
             return Ok(facebookLogin);
         }
 
-        [HttpPost]
-        public IHttpActionResult Test(SocialLoginViewModel loginModel)
+        [HttpGet]
+        public IHttpActionResult Test()
         {
 
             var userInfoes = SocialService.GetUserInfo();
-
-            try
-            {
-                throw new Exception(userInfoes.ToArray()[0].Id + " | " + userInfoes.ToArray()[0].Name);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
             
             var authorsVkAll = SocialService.GetAllAuthors(Socials.Vk);
             //var authorsFacebookAll = _socialService.GetAllAuthors(Socials.Facebook);
@@ -98,9 +89,9 @@ namespace uFeed.WEB.Controllers
             return Ok();
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("authors")]
-        public IHttpActionResult GetAllAuthors(SocialLoginViewModel loginModel)
+        public IHttpActionResult GetAllAuthors()
         {
 
             var model = new GetAuthorsViewModel();
@@ -122,9 +113,9 @@ namespace uFeed.WEB.Controllers
             return Json(model);
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("authors/{page}/{count}")]
-        public IHttpActionResult GetAuthors(SocialLoginViewModel loginModel, int page, int count)
+        public IHttpActionResult GetAuthors(int page, int count)
         {
             try
             {
@@ -153,9 +144,9 @@ namespace uFeed.WEB.Controllers
             }            
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("feed/{categoryId}/{page}/{postsPerGroup}")]
-        public IHttpActionResult GetFeed(SocialLoginViewModel loginModel, int categoryId, int page, int postsPerGroup)
+        public IHttpActionResult GetFeed(int categoryId, int page, int postsPerGroup)
         {
 
             try
@@ -166,19 +157,15 @@ namespace uFeed.WEB.Controllers
 
                 return Json(feed);
             }
-            catch (EntityNotFoundException ex)
+            catch (ServiceException ex)
             {
                 return BadRequest(ex.Message);
             }
-            catch (Exception ex)
-            {               
-                return BadRequest(ex.ToString());
-            }
 }
 
-        [HttpPost]
+        [HttpGet]
         [Route("bookmarks")]
-        public IHttpActionResult GetBookmarks(SocialLoginViewModel loginModel)
+        public IHttpActionResult GetBookmarks()
         {
             int userId = CurrentUser.Id;
 
@@ -188,17 +175,13 @@ namespace uFeed.WEB.Controllers
 
                 return Json(posts);
             }
-            catch (EntityNotFoundException ex)
+            catch (ServiceException ex)
             {
                 return BadRequest(ex.Message);
             }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.ToString());
-            }
         }
 
-        [HttpPost]
+        [HttpDelete]
         [Route("bookmarks/{postId}/delete")]
         public IHttpActionResult DeleteBookmarks(string postId)
         {
@@ -208,13 +191,9 @@ namespace uFeed.WEB.Controllers
 
                 return Ok();
             }
-            catch (EntityNotFoundException ex)
+            catch (ServiceException ex)
             {
                 return BadRequest(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.ToString());
             }
         }
 
@@ -233,10 +212,6 @@ namespace uFeed.WEB.Controllers
             catch (EntityNotFoundException ex)
             {
                 return BadRequest(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.ToString());
             }
         }
     }

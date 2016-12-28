@@ -22,7 +22,8 @@ namespace uFeed.WEB.Controllers
         [HttpPost]
         [Route("category/new")]
         public IHttpActionResult Create(CategoryViewModel categoryViewModel)
-        {           
+        {
+            categoryViewModel.UserId = CurrentUser.Id;
             var categoryDto = Mapper.Map<CategoryDTO>(categoryViewModel);
             _categoryService.Create(categoryDto);
 
